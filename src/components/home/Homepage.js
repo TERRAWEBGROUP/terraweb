@@ -9,8 +9,8 @@ function Homepage() {
   const navigate = useNavigate();
 
   return (
-    <div className="App">
-      <div class="section-hero ">
+    <div className="App bg-black white">
+      <div className="section-hero white">
         <div class="hero container">
           <h2 class="hero__heading">
             Welcome to <span>Terraweb</span>
@@ -40,9 +40,9 @@ function Homepage() {
           alt="terraweb logo"
           class="about-section__image"
         />
-        <div class="about-section__text">
+        <div className="about-section__text white">
           <h3 class="about-section__text--heading">Who are we?</h3>
-          <p class="about-section__text--paragraph">
+          <p className="about-section__text--paragraph white">
             Lorem ipsum dolor sit, amet consectetur adipisicing elit.
             Dolore,delectus blanditiis? Cumque rem animi excepturi eos ullam,
             earum in voluptatum eligendi suscipit, totam temporibus asperiores

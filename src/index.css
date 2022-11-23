@@ -119,7 +119,7 @@ justify-items: center;
         
 
 .section-hero {
-  background-image: url("../public/IMG/hero.jpg");
+  background-image: url("../src//components/assets/img/hero.jpg");
   background-position: top;
   background-size: cover;
   margin-bottom: 12rem; }
@@ -305,7 +305,7 @@ justify-items: center;
        }
     }
     .Ap{
-      background-image: url("../public/IMG/hero.jpg");
+      background-image: url("../src/components/assets/img/hero.jpg");
 
   background-size:cover; 
   
