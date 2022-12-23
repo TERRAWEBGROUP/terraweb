@@ -18,30 +18,30 @@ export default function ForgotPass({
   const navigate = useNavigate();
 
   return (
-    <div class="login">
-      <div class="login__box">
-        <div class="login__header">
+    <div class="forgotpass">
+      <div class="forgotpass__box">
+        <div className="forgotpass__header ">
           <img
             src="img/WHITE LOGO.png"
             alt="terraweb white logo"
-            class="login__header--image"
+            className="forgotpass__header--image"
           />
         </div>
-        <button className="btn w-100">
-          <label className="black f3">
+        <button className="reset__btn ">
+          <label className="resetlabel black b f3 w-100">
             You will recieve an email to reset your password if your email is in
             our database
           </label>
         </button>
-        <div class="login__main">
+        <div class="forgotpass__main">
           <input
             type="email"
             placeholder="email"
             id="emailforgot"
-            class="login__inputpass"
+            class="forgotpass__inputpass"
           />
 
-          <div class="login__btns">
+          <div class="forgotpass__btns">
             <button class="btn btn-white">
               <label class="link-white">Reset</label>
             </button>

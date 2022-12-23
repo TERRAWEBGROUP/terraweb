@@ -14,7 +14,7 @@ const ReadOnlyRow = ({
       <td>{contact.password}</td>
       <td>{contact.joined}</td>
       <td>{contact.company}</td>
-      <td>{contact.level}</td>
+
       <td>{contact.lastactive}</td>
 
       <td>

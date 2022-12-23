@@ -11,8 +11,9 @@ import { Oval } from "react-loader-spinner";
 
 import "./register.css";
 import "tachyons";
+import Register from "./Register";
 
-function Register(props) {
+function RegisterAdmin(props) {
   const navigate = useNavigate();
   //store variables onchange to send to backend
 
@@ -25,6 +26,7 @@ function Register(props) {
 
   const [names, setNames] = useState({
     fullname: "",
+
     username: "",
     company: "",
     phone: "",
@@ -67,6 +69,19 @@ function Register(props) {
     }));
   };
 
+  //handle lname input
+  const onLNameChange = (event) => {
+    if (names.lname.length >= 1) {
+      setFlag(1);
+    } else {
+      setFlag(2);
+    }
+    // Spreading "...state" ensures we don't "lose" fname,lname,email... etc
+    setNames((names) => ({
+      ...names,
+      lname: event.target.value,
+    }));
+  };
   //handle username input
   const onUsernameChange = (event) => {
     if (names.username.length >= 1) {
@@ -173,7 +188,7 @@ function Register(props) {
     if (flag === 1) {
       setIsLoading(true);
 
-      fetch("http://localhost:8000/registerUser", {
+      fetch("http://localhost:8000/registerAdmin", {
         method: "post",
         headers: { "Content-Type": "application/JSON" },
         body: JSON.stringify({
@@ -232,6 +247,7 @@ function Register(props) {
           alt="terraweb white logo"
           class="register__header--image"
         />
+        <label className="fnamelabel white b f2">| Admin Registration</label>
       </div>
       <div className="register__main">
         <label className="fnamelabel b f4">
@@ -242,7 +258,7 @@ function Register(props) {
           onChange={onFnameChange}
           type="text"
           placeholder="First Name"
-          className="register__input__firstname tl w-60-l"
+          className="register__input__firstname w-60-l tl "
           aria-describedby="name-desc"
         />
 
@@ -284,7 +300,7 @@ function Register(props) {
         {passConfirmErr === "not match" ? (
           <p className="card-tite f6 b red">Passwords do not match</p>
         ) : null}
-        <b className="b f4">Enter your company </b>
+        <b className="b f4">Enter your company/companies (Optional) </b>
         <input
           onChange={onCompanyChange}
           type="text"
@@ -359,4 +375,4 @@ function Register(props) {
     </div>
   );
 }
-export default Register;
+export default RegisterAdmin;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import Cookies from "js-cookie";
 
@@ -10,16 +10,19 @@ import Cookies from "js-cookie";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import Register from "./components/register/Register";
+
+import RegisterAdmin from "./components/register/RegisterAdmin";
+
 import Login from "./components/login/Login";
 import ForgotPass from "./components/login/ForgotPass";
 
 import Terms from "./components/terms/Terms";
 import Homepage from "./components/home/Homepage";
+import Home from "./components/home/Home";
 
 //footer and headers
 import Footer from "./components/topHeader/Footer";
 import AdminDashboardHeader from "./components/topHeader/AdminDashboardHeader";
-import LoginHeader from "./components/topHeader/LoginHeader";
 
 //users
 import Users from "./components/admin/users/Users";
@@ -37,6 +40,24 @@ import Summary from "./components/admin/records/Summary";
 //profile
 import AdminProfile from "./components/admin/profile/AdminProfile";
 
+//nav bar modal
+import LoginNavModal from "./components/topHeader/LoginNavModal";
+
+//Login navbar
+import LoginNavBar from "./components/topHeader/LoginNavBar";
+
+//User dashboard header
+import UserDashboardHeader from "./components/topHeader/UserDashboardHeader";
+
+//User nav modal
+import UserNavModal from "./components/topHeader/UserNavModal";
+
+//Admin nav modal
+import AdminNavModal from "./components/topHeader/AdminNavModal";
+
+//records populated in calender view
+import RecordsCalender from "./components/user/recordsCalender/RecordsCalender";
+
 // import MyAccount from "./components/myAccount/MyAccount";
 
 // import MainAppCounter from "./components/counter/MainAppCounter";
@@ -48,14 +69,36 @@ import AdminProfile from "./components/admin/profile/AdminProfile";
 // import { useSelector, useDispatch } from "react-redux";
 
 function App() {
-  let isSignedIn = false;
+  //login variable that determines if admin or normal user and if signed in
+  let loginStatus = "";
 
-  let signinCookie = Cookies.get("id");
-  if (signinCookie >= 1) {
-    isSignedIn = true;
-  } else {
-    isSignedIn = false;
-  }
+  let isSignedIn = false;
+  let isAdmin = false;
+  let isUser = false;
+
+  let userCookie = "";
+  userCookie = Cookies.get("sessioniduser");
+
+  let adminCookie = "";
+  adminCookie = Cookies.get("sessionidadmin");
+
+  try {
+    if (userCookie.length >= 8) {
+      isAdmin = false;
+      isUser = true;
+      loginStatus = "isUser";
+      console.log("user user is logged in " + loginStatus);
+    } else if (adminCookie.length >= 8) {
+      isAdmin = true;
+      isUser = false;
+      loginStatus = "isAdmin";
+      console.log("user is logged in " + loginStatus);
+    } else {
+      isAdmin = false;
+      isUser = false;
+      loginStatus = "";
+    }
+  } catch (error) {}
 
   //scrollto element
   let textInput = null;
@@ -123,12 +166,23 @@ function App() {
     }
   };
 
-  switch (isSignedIn) {
-    case true:
+  //display navbar modal
+  const [isOpen, setIsOpen] = useState(false);
+
+  function toggleModal() {
+    setIsOpen(!isOpen);
+    console.log("The nav is open" + isOpen);
+  }
+
+  switch (loginStatus) {
+    case "isAdmin":
       return (
         <Router>
           <div className="Ap    ">
-            <AdminDashboardHeader />
+            {/* <AdminDashboardHeader /> */}
+            <AdminDashboardHeader toggleModal={toggleModal} isOpen={isOpen} />
+
+            <AdminNavModal toggleModal={toggleModal} isOpen={isOpen} />
 
             {/* <div class="main__top-bar">
               <div class="main__top-bar--balance">
@@ -202,18 +256,93 @@ function App() {
                 exact
                 path="/dailyrecords"
                 element={
-                  <section className="coolbg pa1 pa1-m">
+                  <section className="coolbg pa1 pa1-m w-90">
                     <Records />
                   </section>
                 }
               ></Route>
-              <Route exact path="/myprofile" element={<AdminProfile />}></Route>
+              <Route
+                exact
+                path="/records"
+                element={
+                  <section className="coolbg pa1 pa1-m w-90">
+                    <Records />
+                  </section>
+                }
+              ></Route>
+              <Route exact path="/profile" element={<AdminProfile />}></Route>
               <Route
                 exact
                 path="*"
                 element={
                   <section className=" center">
-                    <Homepage
+                    <Home
+                      setAboutTerraweb={setAboutTerraweb}
+                      setBlog={setBlog}
+                      setServices={setServices}
+                      setTerms={setTerms}
+                    />
+                  </section>
+                }
+              ></Route>
+            </Routes>
+            <Footer
+              executeScroll={executeScroll}
+              executeScroll2={executeScroll2}
+              executeScroll3={executeScroll3}
+              executeScroll4={executeScroll4}
+              executeScroll5={executeScroll5}
+              executeScroll6={executeScroll6}
+            />
+          </div>
+        </Router>
+      );
+    case "isUser":
+      return (
+        <Router>
+          <div className="Ap    ">
+            {/* <AdminDashboardHeader /> */}
+            <UserDashboardHeader toggleModal={toggleModal} isOpen={isOpen} />
+
+            <UserNavModal toggleModal={toggleModal} isOpen={isOpen} />
+
+            <Routes>
+              <Route exact path="/home" element={<Home />}></Route>
+
+              <Route
+                exact
+                path="/records"
+                element={
+                  <section className="coolbg pa1-m pa1">
+                    <RecordsCalender />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/records/summary"
+                element={
+                  <section className="coolbg pa1-m pa1">
+                    <RecordsCalender />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/records/dailyrecords"
+                element={
+                  <section className="coolbg pa1-m pa1">
+                    <RecordsCalender />
+                  </section>
+                }
+              ></Route>
+              <Route exact path="/profile" element={<AdminProfile />}></Route>
+              <Route
+                exact
+                path="*"
+                element={
+                  <section className=" center">
+                    <Home
                       setAboutTerraweb={setAboutTerraweb}
                       setBlog={setBlog}
                       setServices={setServices}
@@ -237,12 +366,33 @@ function App() {
 
     default:
       return (
-        <Router>
-          <div className="Ap    ">
-            <LoginHeader />
+        <div className="Ap">
+          <Router>
+            <LoginNavBar toggleModal={toggleModal} />
+            {/* <LoginHeader /> */}
+
+            <LoginNavModal toggleModal={toggleModal} isOpen={isOpen} />
 
             <Routes>
-              <Route exact path="/login" element={<Login />}></Route>
+              <Route
+                exact
+                path="/registerAdmin"
+                element={
+                  <section className="coolbg pa1-m pa1">
+                    <RegisterAdmin />
+                  </section>
+                }
+              ></Route>
+
+              <Route
+                exact
+                path="/login"
+                element={
+                  <section className="coolbg pa1-m pa1">
+                    <Login />
+                  </section>
+                }
+              ></Route>
               <Route
                 path="/register"
                 element={
@@ -269,22 +419,20 @@ function App() {
                   </section>
                 }
               ></Route>
+
               <Route
                 exact
                 path="*"
                 element={
-                  <section className=" center">
-                    <Homepage
-                      setAboutTerraweb={setAboutTerraweb}
-                      setBlog={setBlog}
-                      setServices={setServices}
-                      setTerms={setTerms}
-                    />
-                  </section>
+                  <Homepage
+                    setAboutTerraweb={setAboutTerraweb}
+                    setBlog={setBlog}
+                    setServices={setServices}
+                    setTerms={setTerms}
+                  />
                 }
               ></Route>
             </Routes>
-
             <Footer
               executeScroll={executeScroll}
               executeScroll2={executeScroll2}
@@ -293,8 +441,8 @@ function App() {
               executeScroll5={executeScroll5}
               executeScroll6={executeScroll6}
             />
-          </div>
-        </Router>
+          </Router>
+        </div>
       );
   }
 }

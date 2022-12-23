@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -10,8 +10,6 @@ import { loadUser } from "../../redux/loginSlice";
 import { Oval } from "react-loader-spinner";
 
 import "../../index.css";
-
-import Footer from "../topHeader/Footer";
 
 function Login() {
   const navigate = useNavigate();
@@ -67,7 +65,7 @@ function Login() {
     } else {
       setIsLoading(true);
 
-      fetch("https://terraweb.herokuapp.com/login", {
+      fetch("http://localhost:8000/login", {
         method: "post",
         headers: { "Content-Type": "application/JSON" },
         body: JSON.stringify({
@@ -86,17 +84,18 @@ function Login() {
           return response.json();
         })
         .then((user) => {
-          if (user[0].id) {
+          if (user.sessioniduser || user.sessionidadmin) {
             setFoundErr(null);
 
+            console.log(user);
             setIsLoading(null);
             // dispatch(loadUser(user[0].id));
 
-            dispatch(loadUser(user[0]));
+            dispatch(loadUser(user));
 
             // console.log(user[0]);
             // navigate("/users");
-            window.location.pathname = "/users";
+            window.location.pathname = "/";
             setFlag(1);
           } else {
             setFlag(2);
@@ -115,7 +114,7 @@ function Login() {
   };
 
   return (
-    <div class="login">
+    <div class="logindiv">
       {/* <section class="login__box"> */}
       <div class="login__header">
         <img
@@ -132,9 +131,9 @@ function Login() {
           class="login__input"
           onChange={onEmailChange}
         />
-        {emailError === "not valid" && (
+        {emailError === "not valid" ? (
           <p className="card-tite f6 b red">Incorrect email format.</p>
-        )}
+        ) : null}
         <input
           type="password"
           id="passwordsgn"
@@ -142,18 +141,18 @@ function Login() {
           class="login__input"
           onChange={onPasswordChange}
         />
-        {flag === 2 && (
+        {flag === 2 ? (
           <label className="red b db">
             Incorrect details! Check your details.
           </label>
-        )}
-        {foundErr && <label className="dt red  pb2">{foundErr}</label>}
+        ) : null}
+        {foundErr ? <label className="dt red  pb2">{foundErr}</label> : null}
 
-        {isLoading && (
+        {isLoading ? (
           <div className="db mb2">
             <Oval type="Oval" color="#0000FF" height={40} width={80} />
           </div>
-        )}
+        ) : null}
         <div className="d-flex w-100">
           <div className="login__btns ">
             <button className="btn btn-orange sign_in ">

@@ -13,25 +13,34 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 const NewRecord = () => {
+  const options = [
+    { value: "", text: "-- choose product type --" },
+    { value: "coffee", text: "coffee" },
+    { value: "tea leaves", text: "tea leaves" },
+    { value: "milk", text: "milk" },
+  ];
+
+  const [names, setNames] = useState({
+    producttype: options[0].value,
+  });
+
   const [contacts, setContacts] = useState(data);
   const [addFormData, setAddFormData] = useState({
     id: "",
     username: "",
-    email: "",
-    password: "",
+    producttype: "",
     created: "",
-    earnings: "",
-    availableAccs: "",
+    company: "",
+    weight: "",
   });
 
   const [editFormData, setEditFormData] = useState({
     id: "",
     username: "",
-    email: "",
-    password: "",
+    producttype: "",
     created: "",
-    earnings: "",
-    availableAccs: "",
+    company: "",
+    weight: "",
   });
 
   const [editContactId, setEditContactId] = useState(null);
@@ -45,26 +54,51 @@ const NewRecord = () => {
   //analysis Constants
   const [totalRecords, settotalRecords] = useState(null);
 
-  const [totalActiveRecords, settotalActiveRecords] = useState(null);
-
   //clear inputs
   const usernameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
 
+  //handle product type input
+  const onProducttypeChange = (event) => {
+    // if (names.gender.length >= 1) {
+    //   setFlag(1);
+    // } else {
+    //   setFlag(2);
+    // }
+    // Spreading "...state" ensures we don't "lose" fname,lname,email... etc
+    setNames((names) => ({
+      ...names,
+      producttype: event.target.value,
+    }));
+
+    //update the form fields before updating
+    event.preventDefault();
+
+    const fieldName = event.target.getAttribute("name");
+    const fieldValue = event.target.value;
+
+    const newFormData = { ...addFormData };
+    newFormData[fieldName] = fieldValue;
+
+    setAddFormData(newFormData);
+
+    console.log(addFormData.producttype);
+  };
+
   useEffect(() => {
     //fetch agents
     const fetchAll = () => {
-      let adminCookie = Cookies.get("tokken");
+      let adminCookie = Cookies.get("id");
       if (adminCookie >= 1) {
         setIsLoading(true);
 
         setTimeout(() => {
-          fetch("https://peaceful-lake-35455.herokuapp.com/myagents", {
+          fetch("https://terraweb.herokuapp.com/getdailyrecords", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
-              adminid: adminCookie,
+              id: adminCookie,
             }),
           })
             .then(function (response) {
@@ -85,6 +119,7 @@ const NewRecord = () => {
                 setIsLoading(null);
                 setContacts(user);
                 loadAnalysis(user);
+                console.log(user);
 
                 //load data
               } else {
@@ -111,27 +146,20 @@ const NewRecord = () => {
   //load analysis
   const loadAnalysis = (datamap) => {
     settotalRecords(datamap.length);
-    let count = 0;
-
-    var i;
-    for (i = 0; i < datamap.length; i++) {
-      count += datamap[i].earnings;
-    }
-    settotalActiveRecords(count);
   };
 
-  //fetch agents
-  const fetchAgents = () => {
-    let adminCookie = Cookies.get("tokken");
+  //fetch users
+  const fetchRecords = () => {
+    let adminCookie = Cookies.get("id");
     if (adminCookie >= 1) {
       setIsLoading(true);
 
       setTimeout(() => {
-        fetch("https://peaceful-lake-35455.herokuapp.com/myagents", {
+        fetch("https://terraweb.herokuapp.com/getdailyrecords", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
-            adminid: adminCookie,
+            id: adminCookie,
           }),
         })
           .then(function (response) {
@@ -198,43 +226,45 @@ const NewRecord = () => {
   };
 
   //refresh after add records
-  const refreshAgents = () => {
-    fetchAgents();
+  const refreshRecords = () => {
+    fetchRecords();
   };
 
   const handleAddFormSubmit = (event) => {
     event.preventDefault();
 
     const newContact = {
-      username: addFormData.username,
-      email: addFormData.email,
-      password: addFormData.password,
+      company: addFormData.company,
+      producttype: addFormData.producttype,
+      weight: addFormData.weight,
     };
 
     if (
-      newContact.username.length >= 1 &&
-      newContact.email.length >= 1 &&
-      newContact.password.length >= 1
+      newContact.company.length >= 1 &&
+      newContact.producttype.length >= 1 &&
+      newContact.weight.length >= 1
     ) {
       //send add agent request
 
-      let adminCookie = Cookies.get("tokken");
-      if (adminCookie >= 1) {
+      // let adminCookie = Cookies.get("id");
+      let adminCookie = "yes";
+      if (adminCookie === "yes") {
         setIsLoadingAdd(true);
         setTimeout(() => {
-          fetch("https://peaceful-lake-35455.herokuapp.com/addmyagent", {
+          fetch("https://localhost:8000/addnrecord", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
-              adminid: adminCookie,
-              username: newContact.username,
-              email: newContact.email,
-              password: newContact.password,
+              id: adminCookie,
+              producttype: newContact.producttype,
+              weight: newContact.weight,
+
+              company: newContact.company,
             }),
           })
             .then(function (response) {
               if (response.status === 400) {
-                throw Error("An error occurred, agent perhaps already exists.");
+                throw Error("An error occurred while adding records. ");
               }
               if (response === 500) {
                 throw Error("Could not complete request because of an error");
@@ -251,7 +281,7 @@ const NewRecord = () => {
                 // setContacts(user);
 
                 //refresh data
-                refreshAgents();
+                refreshRecords();
 
                 //clear textboxes
                 usernameRef.current.value = "";
@@ -278,222 +308,79 @@ const NewRecord = () => {
       } else {
         setIsLoadingAdd(null);
       }
-    }
-  };
-
-  const handleEditFormSubmit = (event) => {
-    event.preventDefault();
-
-    const editedContact = {
-      id: editFormData.id,
-      username: editFormData.username,
-      email: editFormData.email,
-      password: editFormData.password,
-
-      earnings: editFormData.earnings,
-    };
-
-    const newContacts = [...contacts];
-
-    const index = contacts.findIndex((contact) => contact.id === editContactId);
-
-    newContacts[index] = editedContact;
-
-    // setContacts(newContacts);
-    // setEditContactId(null);
-    console.log(newContacts[index].id);
-
-    //send add agent request
-
-    let adminCookie = Cookies.get("tokken");
-    if (adminCookie >= 1) {
-      setIsLoadingSave(true);
-      setTimeout(() => {
-        fetch("https://peaceful-lake-35455.herokuapp.com/updateagent", {
-          method: "post",
-          headers: { "Content-Type": "application/JSON" },
-          body: JSON.stringify({
-            adminid: adminCookie,
-            username: newContacts[index].username,
-            email: newContacts[index].email,
-            password: newContacts[index].password,
-            earnings: newContacts[index].earnings,
-          }),
-        })
-          .then(function (response) {
-            if (response.status === 400) {
-              throw Error("An error occurred, during update.");
-            }
-            if (response === 500) {
-              throw Error("Could not complete request because of an error");
-            }
-
-            return response.json();
-          })
-          .then((user) => {
-            console.log(user);
-            if (user[0].id >= 1) {
-              setFoundErr(null);
-
-              setIsLoadingSave(null);
-
-              refreshAgents();
-              setEditContactId(null);
-              //load data
-            } else {
-              //dont load
-
-              setFoundErrAdd(null);
-              setIsLoadingSave(null);
-              // addFormData.username = "";
-            }
-          })
-          .catch((err) => {
-            setFoundErrAdd(err.message);
-            setIsLoadingSave(null);
-
-            // setFlag(1);
-          });
-      }, 1000);
     } else {
-      setIsLoadingSave(null);
+      console.log("unable to proceed");
     }
-  };
-
-  const handleEditClick = (event, contact) => {
-    event.preventDefault();
-    setEditContactId(contact.id);
-
-    const formValues = {
-      id: contact.id,
-      username: contact.username,
-      email: contact.email,
-      password: contact.password,
-      created: contact.created,
-      earnings: contact.earnings,
-      availableAccs: contact.availableAccs,
-    };
-
-    setEditFormData(formValues);
-  };
-
-  const handleCancelClick = () => {
-    setEditContactId(null);
-  };
-
-  //confirm delete agent
-  const onDeleteYes = (contactemail) => {
-    let adminCookie = Cookies.get("tokken");
-    if (adminCookie >= 1) {
-      fetch("https://peaceful-lake-35455.herokuapp.com/deleteagent", {
-        method: "post",
-        headers: { "Content-Type": "application/JSON" },
-        body: JSON.stringify({
-          adminid: adminCookie,
-
-          email: contactemail,
-        }),
-      })
-        .then(function (response) {
-          if (response.status === 400) {
-            throw Error("An error occurred, during delete.");
-          }
-          if (response === 500) {
-            throw Error("Could not complete request because of an error");
-          }
-
-          return response.json();
-        })
-        .then((user) => {
-          console.log(user);
-
-          if (user) {
-            refreshAgents();
-          } else {
-            //dont load
-          }
-        })
-        .catch((err) => {
-          // setFlag(1);
-        });
-    } else {
-    }
-  };
-
-  const handleDeleteClick = (contactemail) => {
-    //delete alert
-    confirmAlert({
-      customUI: ({ onClose }) => {
-        return (
-          <div className="bg-white br3 bb b--black-10   pa2 w-100 shadow-5 center ">
-            <h1>Confirm Delete Agent</h1>
-            <p>Sure you want to delete this agent record?</p>
-            <p className="b red f5">Note that this is undoable.</p>
-            <label
-              className="dib w3 tc pa2 ma2 white br-pill bg-red "
-              onClick={onClose}
-            >
-              No
-            </label>
-            <label
-              className="dib w4 fr tc pa2 ma2 white br-pill bg-blue "
-              onClick={() => {
-                onDeleteYes(contactemail);
-                onClose();
-              }}
-            >
-              Yes, Delete it!
-            </label>
-          </div>
-        );
-      },
-    });
   };
 
   return (
-    <div className="app-container center ">
+    <div className="app-container center mt6">
+      {isLoading ? (
+        <div className="db mb2">
+          <Circles type="Oval" color="#000080" height={40} width={80} />
+        </div>
+      ) : null}
+
+      <div className="dib-l">
+        <label className="ma2 white f3 b">
+          Total Weight for all companies
+          <label className="strong red ml2 mr2">{totalRecords}</label>
+        </label>
+
+        <label className="ma2 white f3 b">
+          Last Recorded
+          <label className="strong red ml2 mr2"></label>
+        </label>
+      </div>
+
       <h2 className="f3 b white">Add New Record</h2>
       <div>
         <input
-          ref={usernameRef}
+          className="br-pill"
           type="text"
-          name="Username"
+          name="company"
           required="required"
           placeholder="Enter a company..."
           onChange={handleAddFormChange}
         />
+        <select
+          className="rounded pa2 ma2 f4 bg-white tracked br-pill w-25-l w-25-m"
+          value={names.producttype}
+          onChange={onProducttypeChange}
+          name="producttype"
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.text}
+            </option>
+          ))}
+        </select>
+
         <input
-          ref={emailRef}
-          type="text"
-          name="email"
-          required="required"
-          placeholder="Enter product..."
-          onChange={handleAddFormChange}
-        />
-        <input
-          ref={passwordRef}
+          className="br-pill"
           type="number"
-          name="password"
-          required="required"
-          placeholder="Enter weight..."
+          name="weight"
+          placeholder="Enter weight (Kgs)"
           onChange={handleAddFormChange}
         />
 
-        {isLoadingAdd && (
+        {isLoadingAdd ? (
           <div className="dib ml2 mr2">
             <Circles type="Oval" color="#000080" height={20} width={40} />
           </div>
-        )}
+        ) : null}
 
-        <button
+        <label
           className=" br-pill bg-white orange f4  b pa2 hover-bg-orange hover-white"
           type="submit"
           onClick={handleAddFormSubmit}
         >
           Add
-        </button>
+        </label>
 
-        {foundErrAdd && <label className="dt red  pb2">{foundErrAdd}</label>}
+        {foundErrAdd ? (
+          <label className="dt red  pb2">{foundErrAdd}</label>
+        ) : null}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -30,21 +30,21 @@ export default function Footer({
         <div class="footer__other-links">
           <h4 class="footer__other-links--heading">Other links</h4>
           <div class="footer__other-links--links">
-            <a href="#" class="footer__other-links--link">
+            <label className="footer__other-links--link hover-white">
               THis should be a link to somewhere
-            </a>
-            <a href="#" class="footer__other-links--link">
+            </label>
+            <label className="footer__other-links--link hover-white">
               THis should be a link to somewhere
-            </a>
-            <a href="#" class="footer__other-links--link">
+            </label>
+            <label className="footer__other-links--link hover-white">
               THis should be a link to somewhere
-            </a>
-            <a href="#" class="footer__other-links--link">
+            </label>
+            <label className="footer__other-links--link hover-white">
               THis should be a link to somewhere
-            </a>
-            <a href="#" class="footer__other-links--link">
+            </label>
+            <label className="footer__other-links--link hover-white">
               THis should be a link to somewhere
-            </a>
+            </label>
           </div>
         </div>
         <div class="footer__team">

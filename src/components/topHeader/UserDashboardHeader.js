@@ -10,7 +10,7 @@ import "tachyons";
 
 import logo from "../assets/img/terrawebLogo.png";
 
-export default function AdminDashboardHeader(props) {
+export default function UserDashboardHeader(props) {
   //handle logout
   const onLogout = () => {
     //remove all cookies
@@ -45,24 +45,12 @@ export default function AdminDashboardHeader(props) {
           </label>
         </li>
 
-        <div class="dropdown">
-          <li class="nav-link">
-            <label onClick={() => navigate("/users")}>
-              <i class="fas fa-clipboard"></i>
-              <span className="ml2">Users</span>
-            </label>
-          </li>
-          <div className="dropdown-content">
-            <label>
-              <i class="fas fa-plus-circle"></i>
-              <span className="ml2">Add User</span>
-            </label>
-            <label>
-              <i class="fas fa-user-times"></i>
-              <span className="ml2">Delete User</span>
-            </label>
-          </div>
-        </div>
+        <li class="nav-link">
+          <label onClick={() => navigate("/blog")}>
+            <i class="fas fa-blog"></i>
+            <span className="ml2">Blog</span>
+          </label>
+        </li>
       </ul>
 
       <i class="hamburger">
@@ -93,15 +81,11 @@ export default function AdminDashboardHeader(props) {
             </label>
           </li>
           <div className="dropdown-content">
-            <label>
-              <i class="fas fa-plus-circle"></i>
-              <span className="ml2">New Record</span>
-            </label>
-            <label>
+            <label onClick={() => navigate("/records/dailyrecords")}>
               <i class="fas fa-clipboard"></i>
               <span className="ml2">Daily Records</span>
             </label>
-            <label>
+            <label onClick={() => navigate("/records/summary")}>
               <i class="fas fa-clipboard"></i>
               <span className="ml2">Summary Records</span>
             </label>

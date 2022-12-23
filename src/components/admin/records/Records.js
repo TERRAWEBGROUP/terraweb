@@ -13,25 +13,36 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 
 const Records = () => {
+  const options = [
+    { value: "", text: "-- choose product type --" },
+    { value: "coffee", text: "coffee" },
+    { value: "tea leaves", text: "tea leaves" },
+    { value: "milk", text: "milk" },
+  ];
+
+  const [names, setNames] = useState({
+    producttype: options[0].value,
+  });
+
+  const [foundUsers, setFoundUsers] = useState();
+
   const [contacts, setContacts] = useState(data);
   const [addFormData, setAddFormData] = useState({
     id: "",
-    username: "",
-    email: "",
-    joined: "",
+    fullname: "",
+    producttype: "",
+    daterecorded: "",
     company: "",
-    level: "",
-    lastactive: "",
+    weight: "",
   });
 
   const [editFormData, setEditFormData] = useState({
     id: "",
-    username: "",
-    email: "",
-    joined: "",
-    company: "",
-    level: "",
-    lastactive: "",
+    fullname: "",
+    producttype: "",
+    daterecorded: "",
+    companyname: "",
+    weight: "",
   });
 
   const [editContactId, setEditContactId] = useState(null);
@@ -42,6 +53,9 @@ const Records = () => {
   const [isLoadingAdd, setIsLoadingAdd] = useState(null);
   const [isLoadingSave, setIsLoadingSave] = useState(null);
 
+  //when record is successfully added
+  const [successAdd, setSuccessAdd] = useState(null);
+
   //analysis Constants
   const [totalRecords, settotalRecords] = useState(null);
 
@@ -50,19 +64,107 @@ const Records = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
 
+  //handle product type input
+  const onProducttypeChange = (event) => {
+    // if (names.gender.length >= 1) {
+    //   setFlag(1);
+    // } else {
+    //   setFlag(2);
+    // }
+    // Spreading "...state" ensures we don't "lose" fname,lname,email... etc
+    setNames((names) => ({
+      ...names,
+      producttype: event.target.value,
+    }));
+
+    //update the form fields before updating
+    event.preventDefault();
+
+    const fieldName = event.target.getAttribute("name");
+    const fieldValue = event.target.value;
+
+    const newFormData = { ...addFormData };
+    newFormData[fieldName] = fieldValue;
+
+    setAddFormData(newFormData);
+
+    console.log(addFormData.producttype);
+  };
+
   useEffect(() => {
     //fetch agents
     const fetchAll = () => {
-      let adminCookie = Cookies.get("id");
-      if (adminCookie >= 1) {
+      try {
+        let adminCookie = Cookies.get("sessionidadmin");
+        if (adminCookie.length >= 1) {
+          setIsLoading(true);
+
+          setTimeout(() => {
+            fetch("http://localhost:8000/getdailyrecords", {
+              method: "post",
+              headers: { "Content-Type": "application/JSON" },
+              body: JSON.stringify({
+                adminid: adminCookie,
+              }),
+            })
+              .then(function (response) {
+                if (response.status === 400) {
+                  throw Error("Wrong credentials");
+                }
+                if (response === 500) {
+                  throw Error("Could not complete request because of an error");
+                }
+
+                return response.json();
+              })
+              .then((user) => {
+                console.log(user);
+                if (user[0].id >= 1) {
+                  setFoundErr(null);
+
+                  setIsLoading(null);
+                  setContacts(user);
+                  // loadAnalysis(user);
+
+                  //load data
+                } else {
+                  //dont load
+
+                  setFoundErr(null);
+                  setIsLoading(null);
+                }
+              })
+              .catch((err) => {
+                // setFoundErr(err.message);
+                setIsLoading(null);
+                // setFlag(1);
+              });
+          }, 2000);
+        } else {
+          setIsLoading(null);
+        }
+      } catch (error) {}
+    };
+
+    fetchAll();
+  }, []);
+
+  //load analysis
+  const loadAnalysis = (datamap) => {};
+
+  //fetch users
+  const fetchRecords = () => {
+    try {
+      let adminCookie = Cookies.get("sessionidadmin");
+      if (adminCookie.length >= 1) {
         setIsLoading(true);
 
         setTimeout(() => {
-          fetch("https://terraweb.herokuapp.com/getdailyrecords", {
+          fetch("http://localhost:8000/getdailyrecords", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
-              id: adminCookie,
+              adminid: adminCookie,
             }),
           })
             .then(function (response) {
@@ -82,8 +184,7 @@ const Records = () => {
 
                 setIsLoading(null);
                 setContacts(user);
-                loadAnalysis(user);
-                console.log(user);
+                // loadAnalysis(user);
 
                 //load data
               } else {
@@ -102,67 +203,11 @@ const Records = () => {
       } else {
         setIsLoading(null);
       }
-    };
-
-    fetchAll();
-  }, []);
-
-  //load analysis
-  const loadAnalysis = (datamap) => {
-    settotalRecords(datamap.length);
+    } catch (error) {}
   };
 
-  //fetch users
-  const fetchRecords = () => {
-    let adminCookie = Cookies.get("id");
-    if (adminCookie >= 1) {
-      setIsLoading(true);
-
-      setTimeout(() => {
-        fetch("https://terraweb.herokuapp.com/getdailyrecords", {
-          method: "post",
-          headers: { "Content-Type": "application/JSON" },
-          body: JSON.stringify({
-            id: adminCookie,
-          }),
-        })
-          .then(function (response) {
-            if (response.status === 400) {
-              throw Error("Wrong credentials");
-            }
-            if (response === 500) {
-              throw Error("Could not complete request because of an error");
-            }
-
-            return response.json();
-          })
-          .then((user) => {
-            console.log(user);
-            if (user[0].id >= 1) {
-              setFoundErr(null);
-
-              setIsLoading(null);
-              setContacts(user);
-              loadAnalysis(user);
-
-              //load data
-            } else {
-              //dont load
-
-              setFoundErr(null);
-              setIsLoading(null);
-            }
-          })
-          .catch((err) => {
-            // setFoundErr(err.message);
-            setIsLoading(null);
-            // setFlag(1);
-          });
-      }, 2000);
-    } else {
-      setIsLoading(null);
-    }
-  };
+  //check if user exists when full name is typed out
+  const fetchUsers = () => {};
 
   const handleAddFormChange = (event) => {
     event.preventDefault();
@@ -198,31 +243,33 @@ const Records = () => {
     event.preventDefault();
 
     const newContact = {
-      company: addFormData.company,
-      product: addFormData.product,
+      companyname: addFormData.companyname,
+      producttype: addFormData.producttype,
       weight: addFormData.weight,
+      fullname: addFormData.fullname,
     };
+    console.log(newContact);
 
     if (
-      newContact.company.length >= 1 &&
-      newContact.product.length >= 1 &&
+      newContact.companyname.length >= 1 &&
+      newContact.producttype.length >= 1 &&
+      newContact.fullname.length >= 1 &&
       newContact.weight.length >= 1
     ) {
       //send add agent request
-
-      let adminCookie = Cookies.get("id");
-      if (adminCookie >= 1) {
+      let adminCookie = Cookies.get("sessionidadmin");
+      if (adminCookie.length >= 1) {
         setIsLoadingAdd(true);
         setTimeout(() => {
-          fetch("https://terraweb.herokuapp.com/addnewrecord", {
+          fetch("http://localhost:8000/addnewrecord", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
-              id: adminCookie,
-              product: newContact.product,
+              adminid: adminCookie,
+              producttype: newContact.producttype,
               weight: newContact.weight,
-
-              company: newContact.company,
+              fullname: newContact.fullname,
+              companyname: newContact.companyname,
             }),
           })
             .then(function (response) {
@@ -242,14 +289,9 @@ const Records = () => {
 
                 setIsLoadingAdd(null);
                 // setContacts(user);
-
+                setSuccessAdd(user);
                 //refresh data
                 refreshRecords();
-
-                //clear textboxes
-                usernameRef.current.value = "";
-                emailRef.current.value = "";
-                passwordRef.current.value = "";
 
                 //load data
               } else {
@@ -257,13 +299,14 @@ const Records = () => {
 
                 setFoundErrAdd(null);
                 setIsLoadingAdd(null);
-                addFormData.username = "";
+                // addFormData.fullname = "";
               }
             })
             .catch((err) => {
+              console.log(err);
               setFoundErrAdd(err.message);
               setIsLoadingAdd(null);
-              newContact.username = "";
+              // newContact.fullname = "";
 
               // setFlag(1);
             });
@@ -279,12 +322,12 @@ const Records = () => {
 
     const editedContact = {
       id: editFormData.id,
-      company: editFormData.company,
-      product: editFormData.product,
+      companyname: editFormData.companyname,
+      producttype: editFormData.producttype,
       weight: editFormData.weight,
 
-      username: editFormData.username,
-      created: editFormData.created,
+      fullname: editFormData.fullname,
+      daterecorded: editFormData.daterecorded,
     };
 
     const newContacts = [...contacts];
@@ -299,19 +342,20 @@ const Records = () => {
 
     //update
 
-    let adminCookie = Cookies.get("id");
+    let adminCookie = Cookies.get("sessionidadmin");
     if (adminCookie >= 1) {
       setIsLoadingSave(true);
       setTimeout(() => {
-        fetch("https://terraweb.herokuapp.com/updaterecord", {
+        fetch("http://localhost/updaterecord", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
-            id: adminCookie,
-            username: newContacts[index].username,
-            email: newContacts[index].email,
-            password: newContacts[index].password,
-            level: newContacts[index].level,
+            adminid: adminCookie,
+            fullname: newContacts[index].fullname,
+            companyname: newContacts[index].companyname,
+            producttype: newContacts[index].producttype,
+            weight: newContacts[index].weight,
+            daterecorded: newContacts[index].daterecorded,
           }),
         })
           .then(function (response) {
@@ -360,11 +404,11 @@ const Records = () => {
 
     const formValues = {
       id: contact.id,
-      company: contact.company,
-      product: contact.product,
+      companyname: contact.companyname,
+      producttype: contact.producttype,
       weight: contact.weight,
-      username: contact.username,
-      created: contact.created,
+      fullname: contact.fullname,
+      daterecorded: contact.daterecorded,
     };
 
     setEditFormData(formValues);
@@ -375,12 +419,12 @@ const Records = () => {
   };
 
   return (
-    <div className="app-container center ">
-      {isLoading && (
+    <div className="app-container center mt6 ">
+      {isLoading ? (
         <div className="db mb2">
           <Circles type="Oval" color="#000080" height={40} width={80} />
         </div>
-      )}
+      ) : null}
 
       <div className="dib-l">
         <label className="ma2 white f3 b">
@@ -398,18 +442,18 @@ const Records = () => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Product</th>
+              <th>Product Type</th>
               <th>Weight</th>
               <th>Company</th>
-              <th>Username</th>
+              <th>Full Name</th>
 
-              <th>Created</th>
+              <th>Recorded</th>
               <th>Edit records</th>
             </tr>
           </thead>
           <tbody>
             {contacts.map((contact) => (
-              <Fragment>
+              <Fragment key={contact.id}>
                 {editContactId === contact.id ? (
                   <EditableRow
                     handleEditFormSubmit={handleEditFormSubmit}
@@ -431,7 +475,7 @@ const Records = () => {
         </table>
       </form>
       <div>
-        {foundErr && <label className="dt red  pb2">{foundErr}</label>}
+        {foundErr ? <label className="dt red  pb2">{foundErr}</label> : null}
 
         <button
           className="ml2 br-pill bg-white orange f3 pa3 b mt2 hover-bg-orange hover-white"
@@ -442,36 +486,54 @@ const Records = () => {
       </div>
 
       <h2 className="f3 b white">Add New Record</h2>
-      <div>
+      <div className="">
         <input
-          ref={usernameRef}
+          className="br-pill"
           type="text"
-          name="comapny"
+          name="company"
           required="required"
           placeholder="Enter a company..."
           onChange={handleAddFormChange}
         />
+        <div className="info dt">
+          <b className="b white f3 ma2">
+            Enter Farmer's names in the format (FirstName LastName)
+          </b>
+          <input
+            className="br-pill w-50"
+            type="text"
+            name="fullname"
+            required="required"
+            placeholder="Farmer's full names (FirstName LastName)"
+            onChange={handleAddFormChange}
+          />
+        </div>
+        <select
+          className="rounded pa2 ma2 f4 bg-white tracked br-pill w-25-l w-25-m"
+          value={names.producttype}
+          onChange={onProducttypeChange}
+          name="producttype"
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.text}
+            </option>
+          ))}
+        </select>
+
         <input
-          ref={emailRef}
-          type="text"
-          name="product"
-          required="required"
-          placeholder="Enter product..."
-          onChange={handleAddFormChange}
-        />
-        <input
-          ref={passwordRef}
+          className="br-pill"
           type="number"
           name="weight"
-          placeholder="Enter weight..."
+          placeholder="Enter weight (Kgs)"
           onChange={handleAddFormChange}
         />
 
-        {isLoadingAdd && (
-          <div className="dib ml2 mr2">
-            <Circles type="Oval" color="#000080" height={20} width={40} />
+        {isLoadingAdd ? (
+          <div className="dib pa3">
+            <Circles type="Oval" color="#000080" height={30} width={40} />
           </div>
-        )}
+        ) : null}
 
         <label
           className=" br-pill bg-white orange f4  b pa2 hover-bg-orange hover-white"
@@ -480,7 +542,14 @@ const Records = () => {
           Add
         </label>
 
-        {foundErrAdd && <label className="dt red  pb2">{foundErrAdd}</label>}
+        {successAdd ? (
+          <div className="br-pill bg-white w-25">
+            <label className="dt green f3 b  pa2">{successAdd}</label>
+          </div>
+        ) : null}
+        {foundErrAdd ? (
+          <label className="dt red f3 b  pb2">{foundErrAdd}</label>
+        ) : null}
       </div>
     </div>
   );

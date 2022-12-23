@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import "../../index.css";
 import "tachyons";
 
-function Homepage() {
+function Home() {
   const navigate = useNavigate();
 
   return (
@@ -20,18 +20,6 @@ function Homepage() {
           We <span>value</span>
           your time and effort as our<span>valued</span> customer
         </p>
-        <div class="hero__buttons">
-          <button className="btn btn-orange br-pill">
-            <label onClick={() => navigate("/login")} class="link-orange">
-              Sign In
-            </label>
-          </button>
-          <button className="btn btn-white br-pill">
-            <label onClick={() => navigate("/register")} class="link-white">
-              Sign Up
-            </label>
-          </button>
-        </div>
       </div>
 
       <div class="about-section container">
@@ -93,4 +81,4 @@ function Homepage() {
   );
 }
 
-export default Homepage;
+export default Home;

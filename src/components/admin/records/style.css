@@ -5,9 +5,14 @@
   padding: 1rem;
   overflow: auto;
   background-color: #fc9c1c;
-  max-width: 80%;
+  max-width: 95%;
 
 
+}
+
+.info{
+  display: flex;
+  flex-direction: column;
 }
 @media screen and (max-width:900px){
   .login {
@@ -63,7 +68,7 @@ th {
 }
 
 td {
-  background-color: rgb(205, 235, 253);
+  background-color: rgb(255, 255, 255);
 }
 
 form {

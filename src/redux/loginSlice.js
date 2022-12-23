@@ -6,7 +6,8 @@ const initialState = {
   isSignedIn: false,
 
   user: {
-    id: "",
+    sessioniduser: "",
+    sessionidadmin: "",
   },
 };
 
@@ -19,17 +20,22 @@ export const loginSlice = createSlice({
       //   window.location.pathname = action.payload;
     },
     loadUser: (state, action) => {
-      state.user.id = action.payload.id;
+      state.user.sessioniduser = action.payload.sessioniduser;
+      state.user.sessionidadmin = action.payload.sessionidadmin;
 
       // state.user.tokken = action.payload[1];
 
       //set cookie
       var inHalfADay = 0.5;
 
-      var userid = state.user.id;
+      var sessioniduser = state.user.sessioniduser;
+      var sessionidadmin = state.user.sessionidadmin;
 
       // var tokkenid = state.user.tokken;
-      Cookies.set("id", userid, {
+      Cookies.set("sessioniduser", sessioniduser, {
+        expires: inHalfADay,
+      });
+      Cookies.set("sessionidadmin", sessionidadmin, {
         expires: inHalfADay,
       });
 

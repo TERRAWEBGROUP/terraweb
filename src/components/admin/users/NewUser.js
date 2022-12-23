@@ -406,11 +406,11 @@ const NewUser = () => {
           onChange={handleAddFormChange}
         />
 
-        {isLoadingAdd && (
+        {isLoadingAdd ? (
           <div className="dib ml2 mr2">
             <Circles type="Oval" color="#000080" height={20} width={40} />
           </div>
-        )}
+        ) : null}
 
         <button
           className=" br-pill bg-white orange f4  b pa2 hover-bg-orange hover-white"
@@ -420,7 +420,9 @@ const NewUser = () => {
           Add
         </button>
 
-        {foundErrAdd && <label className="dt red  pb2">{foundErrAdd}</label>}
+        {foundErrAdd ? (
+          <label className="dt red  pb2">{foundErrAdd}</label>
+        ) : null}
       </div>
     </div>
   );

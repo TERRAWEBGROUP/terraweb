@@ -452,11 +452,11 @@ const Summary = () => {
 
   return (
     <div className="app-container center ">
-      {isLoading && (
+      {isLoading ? (
         <div className="db mb2">
           <Circles type="Oval" color="#000080" height={40} width={80} />
         </div>
-      )}
+      ) : null}
 
       <form onSubmit={handleEditFormSubmit}>
         <table>
@@ -490,7 +490,7 @@ const Summary = () => {
         </table>
       </form>
       <div>
-        {foundErr && <label className="dt red  pb2">{foundErr}</label>}
+        {foundErr ? <label className="dt red  pb2">{foundErr}</label> : null}
 
         <button
           className="ml2 br-pill bg-white orange f3 pa3 b mt2 hover-bg-orange hover-white"

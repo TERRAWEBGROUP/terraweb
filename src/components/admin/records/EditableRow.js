@@ -39,23 +39,26 @@ const EditableRow = ({
           onChange={handleEditFormChange}
         ></input>
       </td>
-      <td></td>
       <td>
         <input
           type="text"
-          placeholder="Edit Username..."
+          placeholder="Edit fullname"
           name="username"
           onChange={handleEditFormChange}
         ></input>
       </td>
+      <td></td>
 
       <td>
-        {isLoadingSave && (
+        {/* switch rendering */}
+        {isLoadingSave ? (
           <div className="dib ml2 mr2">
             <Circles type="Oval" color="#000080" height={20} width={40} />
           </div>
-        )}
-        <button onClick={handleEditFormSubmit}>Save</button>
+        ) : null}
+        <button onClick={handleEditFormSubmit} className="mr2">
+          Save
+        </button>
         <button type="button" onClick={handleCancelClick}>
           Cancel
         </button>

@@ -20,8 +20,6 @@ const Users = () => {
     email: "",
     joined: "",
     company: "",
-    level: "",
-    lastactive: "",
   });
 
   const [editFormData, setEditFormData] = useState({
@@ -30,8 +28,6 @@ const Users = () => {
     email: "",
     joined: "",
     company: "",
-    level: "",
-    lastactive: "",
   });
 
   const [editContactId, setEditContactId] = useState(null);
@@ -55,16 +51,16 @@ const Users = () => {
   useEffect(() => {
     //fetch agents
     const fetchAll = () => {
-      let adminCookie = Cookies.get("id");
-      if (adminCookie >= 1) {
+      let adminCookie = Cookies.get("sessionidadmin");
+      if (adminCookie.length >= 1) {
         setIsLoading(true);
 
         setTimeout(() => {
-          fetch("https://terraweb.herokuapp.com/getusers", {
+          fetch("http://localhost:8000/getusers", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
-              id: adminCookie,
+              adminid: adminCookie,
             }),
           })
             .then(function (response) {
@@ -123,16 +119,16 @@ const Users = () => {
 
   //fetch users
   const fetchUsers = () => {
-    let adminCookie = Cookies.get("id");
-    if (adminCookie >= 1) {
+    let adminCookie = Cookies.get("sessionidadmin");
+    if (adminCookie.length >= 1) {
       setIsLoading(true);
 
       setTimeout(() => {
-        fetch("https://terraweb.herokuapp.com/getusers", {
+        fetch("http://localhost:8000/getusers", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
-            id: adminCookie,
+            adminid: adminCookie,
           }),
         })
           .then(function (response) {
@@ -219,15 +215,15 @@ const Users = () => {
     ) {
       //send add agent request
 
-      let adminCookie = Cookies.get("id");
-      if (adminCookie >= 1) {
+      let adminCookie = Cookies.get("sessionidadmin");
+      if (adminCookie.length >= 1) {
         setIsLoadingAdd(true);
         setTimeout(() => {
-          fetch("https://terraweb.herokuapp.com/adduser", {
+          fetch("http://localhost:8000/addAdmin", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
-              id: adminCookie,
+              adminid: adminCookie,
               username: newContact.username,
               email: newContact.email,
               password: newContact.password,
@@ -312,15 +308,14 @@ const Users = () => {
     if (adminCookie >= 1) {
       setIsLoadingSave(true);
       setTimeout(() => {
-        fetch("https://terraweb.herokuapp.com/updateuser", {
+        fetch("http://localhost:8000/updateuser", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
-            admidinid: adminCookie,
+            adminid: adminCookie,
             username: newContacts[index].username,
             email: newContacts[index].email,
             password: newContacts[index].password,
-            level: newContacts[index].level,
           }),
         })
           .then(function (response) {
@@ -453,12 +448,12 @@ const Users = () => {
   // };
 
   return (
-    <div className="app-container center ">
-      {isLoading && (
+    <div className="app-container center mt6">
+      {isLoading ? (
         <div className="db mb2">
           <Circles type="Oval" color="#000080" height={40} width={80} />
         </div>
-      )}
+      ) : null}
 
       <div className="dib-l">
         <label className="ma2 white f3 b">
@@ -475,20 +470,20 @@ const Users = () => {
         <table>
           <thead>
             <tr>
-              <th>User ID</th>
+              <th>admin ID</th>
               <th>Username</th>
               <th>Email</th>
               <th>Password</th>
               <th>Created</th>
               <th>Company</th>
-              <th>Level</th>
+
               <th>Last Active</th>
               <th>Edit Users</th>
             </tr>
           </thead>
           <tbody>
             {contacts.map((contact) => (
-              <Fragment>
+              <Fragment key={contact.id}>
                 {editContactId === contact.id ? (
                   <EditableRow
                     handleEditFormSubmit={handleEditFormSubmit}
@@ -510,7 +505,7 @@ const Users = () => {
         </table>
       </form>
       <div>
-        {foundErr && <label className="dt red  pb2">{foundErr}</label>}
+        {foundErr ? <label className="dt red  pb2">{foundErr}</label> : null}
 
         <button
           className="ml2 br-pill bg-white orange f3 pa3 b mt2 hover-bg-orange hover-white"
@@ -547,11 +542,11 @@ const Users = () => {
           onChange={handleAddFormChange}
         />
 
-        {isLoadingAdd && (
+        {isLoadingAdd ? (
           <div className="dib ml2 mr2">
             <Circles type="Oval" color="#000080" height={20} width={40} />
           </div>
-        )}
+        ) : null}
 
         <button
           className=" br-pill bg-white orange f4  b pa2 hover-bg-orange hover-white"
@@ -561,7 +556,9 @@ const Users = () => {
           Add
         </button>
 
-        {foundErrAdd && <label className="dt red  pb2">{foundErrAdd}</label>}
+        {foundErrAdd ? (
+          <label className="dt red  pb2">{foundErrAdd}</label>
+        ) : null}
       </div>
     </div>
   );

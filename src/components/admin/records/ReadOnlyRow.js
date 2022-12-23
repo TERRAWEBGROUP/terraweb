@@ -9,11 +9,11 @@ const ReadOnlyRow = ({
   return (
     <tr className="hover-red">
       <td>{contact.id}</td>
-      <td>{contact.product}</td>
+      <td>{contact.producttype}</td>
       <td>{contact.weight}</td>
-      <td>{contact.company}</td>
-      <td>{contact.username}</td>
-      <td>{contact.created}</td>
+      <td>{contact.companyname}</td>
+      <td>{contact.fullname}</td>
+      <td>{contact.daterecorded}</td>
 
       <td>
         <button
