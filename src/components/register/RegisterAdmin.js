@@ -26,6 +26,8 @@ function RegisterAdmin(props) {
 
   const [names, setNames] = useState({
     fullname: "",
+    firstname: "",
+    lname: "",
 
     username: "",
     company: "",
@@ -57,7 +59,7 @@ function RegisterAdmin(props) {
 
   //handle first name input
   const onFnameChange = (event) => {
-    if (names.fullname.length >= 1) {
+    if (names.firstname.length >= 3) {
       setFlag(1);
     } else {
       setFlag(2);
@@ -65,13 +67,13 @@ function RegisterAdmin(props) {
     // Spreading "...state" ensures we don't "lose" fname,lname,email... etc
     setNames((names) => ({
       ...names,
-      fullname: event.target.value,
+      firstname: event.target.value,
     }));
   };
 
   //handle lname input
   const onLNameChange = (event) => {
-    if (names.lname.length >= 1) {
+    if (names.lname.length >= 3) {
       setFlag(1);
     } else {
       setFlag(2);
@@ -84,7 +86,7 @@ function RegisterAdmin(props) {
   };
   //handle username input
   const onUsernameChange = (event) => {
-    if (names.username.length >= 1) {
+    if (names.username.length >= 3) {
       setFlag(1);
     } else {
       setFlag(2);
@@ -97,7 +99,7 @@ function RegisterAdmin(props) {
   };
   //handle company input
   const onCompanyChange = (event) => {
-    if (names.company.length >= 1) {
+    if (names.company.length >= 3) {
       setFlag(1);
     } else {
       setFlag(2);
@@ -110,7 +112,7 @@ function RegisterAdmin(props) {
   };
   //handle phone input
   const onPhoneChange = (event) => {
-    if (names.phone.length >= 1) {
+    if (names.phone.length >= 10) {
       setFlag(1);
     } else {
       setFlag(2);
@@ -250,17 +252,27 @@ function RegisterAdmin(props) {
         <label className="fnamelabel white b f2">| Admin Registration</label>
       </div>
       <div className="register__main">
-        <label className="fnamelabel b f4">
-          Full Name in the format (FirstName LastName)
-        </label>
+        <div className="input_contaier  ">
+          <div className="lname_container">
+            <label className="fnamelabel b f4 tl">First Name</label>
 
-        <input
-          onChange={onFnameChange}
-          type="text"
-          placeholder="First Name"
-          className="register__input__firstname w-60-l tl "
-          aria-describedby="name-desc"
-        />
+            <input
+              type="text"
+              placeholder="Firstname"
+              className="register__input tl"
+              onChange={onFnameChange}
+            />
+          </div>
+          <div className="lname_container">
+            <label className="fnamelabel b f4 ">Last Name</label>
+            <input
+              type="text"
+              placeholder="Lastname"
+              className="register__input tl"
+              onChange={onLNameChange}
+            />
+          </div>
+        </div>
 
         <b className="b f4 tl">What's your email?</b>
         <input
@@ -270,7 +282,7 @@ function RegisterAdmin(props) {
           onChange={onEmailChange}
         />
         {emailError === "not valid" ? (
-          <p className="card-tite f6 b red">Incorrect email format.</p>
+          <p className="card-tite f5 b red">Incorrect email format.</p>
         ) : null}
         <b className="b f4">Create a username or nick name</b>
         <input
@@ -333,7 +345,7 @@ function RegisterAdmin(props) {
         {foundErr ? <label className="dt b red mv3">{foundErr}</label> : null}
 
         {flag === 2 ? (
-          <p className="card-tite f6 red b">Some fields are incorrect.</p>
+          <p className="card-tite f5 red b">Some fields are incorrect.</p>
         ) : null}
         {success === "success" ? (
           <p className="card-tite f4 blue b">

@@ -74,6 +74,7 @@ function App() {
 
   let isSignedIn = false;
   let isAdmin = false;
+  let isFieldAdmin = false;
   let isUser = false;
 
   let userCookie = "";
@@ -81,6 +82,9 @@ function App() {
 
   let adminCookie = "";
   adminCookie = Cookies.get("sessionidadmin");
+
+  let sessiontype = "";
+  sessiontype = Cookies.get("sessiontype");
 
   try {
     if (userCookie.length >= 8) {
@@ -96,6 +100,34 @@ function App() {
     } else {
       isAdmin = false;
       isUser = false;
+      loginStatus = "";
+    }
+  } catch (error) {}
+
+  try {
+    if (sessiontype === "farmer") {
+      isAdmin = false;
+      isUser = true;
+      isFieldAdmin = false;
+      loginStatus = "isUser";
+      console.log("user user is logged in " + loginStatus);
+    } else if (sessiontype === "fieldAdmin") {
+      isAdmin = false;
+      isUser = false;
+      isFieldAdmin = false;
+      loginStatus = "isFieldAdmin";
+      console.log("field admin is logged in " + loginStatus);
+    } else if (sessiontype === "admin") {
+      isAdmin = true;
+      isUser = false;
+
+      isFieldAdmin = false;
+      loginStatus = "isAdmin";
+      console.log("Admin is logged in " + loginStatus);
+    } else {
+      isAdmin = false;
+      isUser = false;
+      isFieldAdmin = false;
       loginStatus = "";
     }
   } catch (error) {}
@@ -176,6 +208,128 @@ function App() {
 
   switch (loginStatus) {
     case "isAdmin":
+      return (
+        <Router>
+          <div className="Ap    ">
+            {/* <AdminDashboardHeader /> */}
+            <AdminDashboardHeader toggleModal={toggleModal} isOpen={isOpen} />
+
+            <AdminNavModal toggleModal={toggleModal} isOpen={isOpen} />
+
+            {/* <div class="main__top-bar">
+              <div class="main__top-bar--balance">
+                <span> Ready to update data for 22 April</span>
+              </div>
+              <div class="main__top-bar--user">
+                <p class="user">
+                  {" "}
+                  Welcome back, <span class="user-name">User Admin 1</span>
+                </p>
+                <image
+                  src="img/user-6.jpg"
+                  alt="user image"
+                  class="user-image"
+                />
+                <a href="index.html" class="user-link">
+                  Log out
+                </a>
+              </div>
+            </div> */}
+            <Routes>
+              <Route exact path="/home" element={<Homepage />}></Route>
+
+              <Route
+                exact
+                path="/users/newuser"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <NewUser />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/users/deleteuser"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <DeleteUser />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/users"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <Users />
+                  </section>
+                }
+              ></Route>
+              {/* <Route exact path="/messages" element={<Messages />}></Route> */}
+              <Route
+                exact
+                path="/records/newrecord"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <NewRecord />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/records/summary"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <Summary />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/dailyrecords"
+                element={
+                  <section className="coolbg pa1 pa1-m w-90">
+                    <Records />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/records"
+                element={
+                  <section className="coolbg pa1 pa1-m w-90">
+                    <Records />
+                  </section>
+                }
+              ></Route>
+              <Route exact path="/profile" element={<AdminProfile />}></Route>
+              <Route
+                exact
+                path="*"
+                element={
+                  <section className=" center">
+                    <Home
+                      setAboutTerraweb={setAboutTerraweb}
+                      setBlog={setBlog}
+                      setServices={setServices}
+                      setTerms={setTerms}
+                    />
+                  </section>
+                }
+              ></Route>
+            </Routes>
+            <Footer
+              executeScroll={executeScroll}
+              executeScroll2={executeScroll2}
+              executeScroll3={executeScroll3}
+              executeScroll4={executeScroll4}
+              executeScroll5={executeScroll5}
+              executeScroll6={executeScroll6}
+            />
+          </div>
+        </Router>
+      );
+    case "isFieldAdmin":
       return (
         <Router>
           <div className="Ap    ">

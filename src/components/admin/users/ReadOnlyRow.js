@@ -12,21 +12,28 @@ const ReadOnlyRow = ({
       <td>{contact.username}</td>
       <td>{contact.email}</td>
       <td>{contact.password}</td>
+      <td>{contact.phone}</td>
       <td>{contact.joined}</td>
       <td>{contact.company}</td>
 
       <td>{contact.lastactive}</td>
+      <td>{contact.category}</td>
+      <td>{contact.status}</td>
 
       <td>
         <button
-          className="mr2"
+          className=" br-pill bw0 bg-orange white hover-bg-yellow tc pa3"
           type="button"
           onClick={(event) => handleEditClick(event, contact)}
         >
-          Edit
+          <label className="center">Edit</label>
         </button>
 
-        <button type="button" onClick={() => handleDeleteClick(contact.email)}>
+        <button
+          className="ml2 br-pill bw0 bg-dark-red hover-bg-red white pa2 "
+          type="button"
+          onClick={() => handleDeleteClick(contact.email, contact.category)}
+        >
           Delete
         </button>
       </td>

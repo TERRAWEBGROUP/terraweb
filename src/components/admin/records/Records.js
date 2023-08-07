@@ -59,6 +59,11 @@ const Records = () => {
   //analysis Constants
   const [totalRecords, settotalRecords] = useState(null);
 
+  //search users in your company
+  const [searchRecord, setSearchRecord] = useState("");
+
+  const [deleteState, setDeleteState] = useState("");
+
   //clear inputs
   const usernameRef = useRef();
   const emailRef = useRef();
@@ -92,19 +97,21 @@ const Records = () => {
   };
 
   useEffect(() => {
-    //fetch agents
+    //fetch records
     const fetchAll = () => {
       try {
         let adminCookie = Cookies.get("sessionidadmin");
-        if (adminCookie.length >= 1) {
+        let userCookie = Cookies.get("sessioniduser");
+        if (adminCookie.length >= 8 || userCookie.length >= 8) {
           setIsLoading(true);
 
           setTimeout(() => {
-            fetch("http://localhost:8000/getdailyrecords", {
+            fetch("http://localhost:8000/getDailyRecords", {
               method: "post",
               headers: { "Content-Type": "application/JSON" },
               body: JSON.stringify({
                 adminid: adminCookie,
+                userid: userCookie,
               }),
             })
               .then(function (response) {
@@ -152,19 +159,90 @@ const Records = () => {
   //load analysis
   const loadAnalysis = (datamap) => {};
 
+  //search records
+  const searchRecords = () => {
+    // setContacts(null);
+    //fetch cookie
+    let adminCookie = Cookies.get("sessionidadmin");
+    if (adminCookie.length >= 1) {
+      setIsLoading(true);
+
+      setTimeout(() => {
+        fetch("http://localhost:8000/searchRecords", {
+          method: "post",
+          headers: { "Content-Type": "application/JSON" },
+          body: JSON.stringify({
+            adminid: adminCookie,
+
+            fullname: searchRecord,
+
+            userid: searchRecord,
+          }),
+        })
+          .then(function (response) {
+            if (response.status === 400) {
+              throw Error("Wrong credentials");
+            }
+            if (response === 500) {
+              throw Error("Could not complete request because of an error");
+            }
+
+            return response.json();
+          })
+          .then((user) => {
+            console.log(user);
+            if (user[0].id >= 1) {
+              setFoundErr(null);
+              setFoundErrAdd(null);
+              setDeleteState(null);
+
+              setIsLoading(null);
+              setContacts(user);
+              loadAnalysis(user);
+
+              //load data
+            } else {
+              //dont load
+
+              setFoundErr(null);
+              setFoundErrAdd(null);
+              setIsLoading(null);
+              setDeleteState(null);
+            }
+          })
+          .catch((err) => {
+            // setFoundErr(err.message);
+            setIsLoading(null);
+            // setFlag(1);
+          });
+      }, 1500);
+    } else {
+      setIsLoading(null);
+    }
+  };
+
+  //handle search user
+  const onSearchChange = (event) => {
+    event.preventDefault();
+    setSearchRecord(event.target.value);
+    console.log(searchRecord);
+  };
+
   //fetch users
   const fetchRecords = () => {
     try {
       let adminCookie = Cookies.get("sessionidadmin");
-      if (adminCookie.length >= 1) {
+      let userCookie = Cookies.get("sessioniduser");
+      if (adminCookie.length >= 8 || userCookie.length >= 8) {
         setIsLoading(true);
 
         setTimeout(() => {
-          fetch("http://localhost:8000/getdailyrecords", {
+          fetch("http://localhost:8000/getDailyRecords", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
               adminid: adminCookie,
+              userid: userCookie,
             }),
           })
             .then(function (response) {
@@ -343,27 +421,29 @@ const Records = () => {
     //update
 
     let adminCookie = Cookies.get("sessionidadmin");
-    if (adminCookie >= 1) {
+    if (adminCookie.length >= 1) {
       setIsLoadingSave(true);
       setTimeout(() => {
-        fetch("http://localhost/updaterecord", {
+        fetch("http://localhost:8000/updateRecord", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
+            id: newContacts[index].id,
             adminid: adminCookie,
             fullname: newContacts[index].fullname,
             companyname: newContacts[index].companyname,
             producttype: newContacts[index].producttype,
             weight: newContacts[index].weight,
-            daterecorded: newContacts[index].daterecorded,
           }),
         })
           .then(function (response) {
             if (response.status === 400) {
-              throw Error("An error occurred, during update.");
+              throw Error(
+                "An error occurred, during update. Try checking the details to make sure they are correct and try again"
+              );
             }
             if (response === 500) {
-              throw Error("Could not complete request because of an error");
+              throw Error("Could not complete request because of an error.");
             }
 
             return response.json();
@@ -427,15 +507,59 @@ const Records = () => {
       ) : null}
 
       <div className="dib-l">
-        <label className="ma2 white f3 b">
-          Total Weight
-          <label className="strong red ml2 mr2">{totalRecords}</label>
-        </label>
+        <div className="controlContainer d-grid bg-white  br4 shadow-3 ">
+          <label className="ma2 black pt3 f3 b">
+            Total Weight
+            <label className="strong red ml2 mr2">{totalRecords}</label>
+          </label>
 
-        <label className="ma2 white f3 b">
-          Last Recorded
-          <label className="strong red ml2 mr2"></label>
-        </label>
+          <label
+            className="ma2 black pt3
+           f3 b"
+          >
+            Last Recorded
+            <label className="strong red ml2 mr2"></label>
+          </label>
+          <label className="ma2 pt3 black f3 b">
+            View personal records
+            <label className="strong red ml2 mr2"></label>
+          </label>
+          <div className="grid-item pa2 dib ">
+            <input
+              type="text"
+              className="searchInput "
+              placeholder="Search Users"
+              onChange={onSearchChange}
+            />
+
+            <button
+              className="  br-pill bw0 bg-orange white hover-bg-yellow tc pa3 "
+              type="button"
+              onClick={searchRecords}
+            >
+              <label className="center f4">Search</label>
+            </button>
+          </div>
+          <div className="grid-item flex-ns pa3 mt2 ">
+            <label className="f3  mt2">
+              Showing <b>1-50</b> of {contacts.count} Entries
+            </label>
+            <button
+              className=" br-pill bw0 ml2 bg-white orange f4  b pa2 hover-bg-orange hover-white"
+              type="submit"
+              onClick={handleAddFormSubmit}
+            >
+              back
+            </button>
+            <button
+              className=" br-pill bw0 ml2 bg-white orange f4  b pa2 hover-bg-orange hover-white"
+              type="submit"
+              onClick={handleAddFormSubmit}
+            >
+              next
+            </button>
+          </div>
+        </div>
       </div>
       <form onSubmit={handleEditFormSubmit}>
         <table>

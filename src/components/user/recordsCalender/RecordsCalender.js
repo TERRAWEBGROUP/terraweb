@@ -39,7 +39,7 @@ const localizer = momentLocalizer(moment); // or globalizeLocalizer
 //   locales,
 // });
 
-const events = [
+let events = [
   // {
   //   title: "34 - coffee",
   //   allDay: true,
@@ -174,7 +174,6 @@ function RecordsCalender() {
 
   //fetch records
   const fetchRecords = () => {
-    events.push = [];
     let adminCookie = Cookies.get("sessioniduser");
     if (adminCookie.length >= 1) {
       setIsLoading(true);
@@ -204,6 +203,8 @@ function RecordsCalender() {
               setIsLoading(null);
               // setContacts(user);
               // loadAnalysis(user);
+
+              events = [];
 
               for (const val of user) {
                 events.push({

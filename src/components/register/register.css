@@ -5,10 +5,12 @@
     margin-top:9rem;
   margin-bottom:2rem;
   
-     width: 50%;
+     width: 70%;
     
     
   }
+
+
   
       @media screen and (max-width:900px){
         .registerdiv {
@@ -35,15 +37,7 @@
           
       }
   
-      /* register form cosmetics */
-      .register__inputpass {
-        width: 70%;
-        border: none;
-        border-bottom: 2px solid #ffd6b1;
-        font-family: roboto;
-        padding-top: 2rem;
-      font-size: medium; }
-  
+    
     .register__header {
       margin-right: auto;
       margin-left: auto;
@@ -66,6 +60,40 @@
       align-items: left;
     }
   
+    /* first name and last name input boxes */
+    .input_container{
+      /* display: flex;
+      column-gap: 20px; */
+      /* justify-content: space-between; */
+      margin-top: auto;
+      background-color: #ffffff;
+      /* padding: 2rem 4rem; */
+      display: flex;
+      flex-direction: column;
+      gap: 1.3rem;
+      align-items: left;
+    }
+    
+    /* media screen when the screen size is small and has to displayed as grid row */
+    @media screen and (max-width:700px){
+      .input_container{
+        display: grid;
+        /* width: 100%; */
+        
+        /* flex-direction: column; */
+        /* justify-content: space-between; */
+        /* column-gap: 10px; */
+        
+      }
+      .lname_container{
+        margin-top: 3px;
+      }
+      .register__input__firstname .register__input__firstname {
+       
+        width: 100%;
+      }
+
+    }
     
     .names__box{
       margin-top: auto;
@@ -96,17 +124,11 @@
             padding-top: 0.2rem;
           font-size: medium; }
 
-        .register__input__firstname, .register__input__lastname {
-          width: 90%;
-          border: none;
-          border-bottom: 2px solid #ffd6b1;
-          font-family: roboto;
-          padding-top: 0.8rem;
-        font-size: medium; }
         
     }
     @media screen and (min-width:600px) {
         .register__input {
+          
             width: 60%;
             border: none;
             border-bottom: 2px solid #ffd6b1;
@@ -116,11 +138,4 @@
     }
   
    
-    .register__input__firstname, .register__input__lastname {
-      width: 100%;
-      border: none;
-      border-bottom: 2px solid #ffd6b1;
-      font-family: roboto;
-      padding-top: 0.8rem;
-    font-size: medium; }
   

@@ -8,6 +8,7 @@ const initialState = {
   user: {
     sessioniduser: "",
     sessionidadmin: "",
+    category: "",
   },
 };
 
@@ -22,6 +23,7 @@ export const loginSlice = createSlice({
     loadUser: (state, action) => {
       state.user.sessioniduser = action.payload.sessioniduser;
       state.user.sessionidadmin = action.payload.sessionidadmin;
+      state.user.category = action.payload.category;
 
       // state.user.tokken = action.payload[1];
 
@@ -30,12 +32,16 @@ export const loginSlice = createSlice({
 
       var sessioniduser = state.user.sessioniduser;
       var sessionidadmin = state.user.sessionidadmin;
+      var category = state.user.category;
 
       // var tokkenid = state.user.tokken;
       Cookies.set("sessioniduser", sessioniduser, {
         expires: inHalfADay,
       });
       Cookies.set("sessionidadmin", sessionidadmin, {
+        expires: inHalfADay,
+      });
+      Cookies.set("sessiontype", category, {
         expires: inHalfADay,
       });
 

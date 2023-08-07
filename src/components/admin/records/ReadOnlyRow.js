@@ -7,7 +7,7 @@ const ReadOnlyRow = ({
   handleDeleteClick,
 }) => {
   return (
-    <tr className="hover-red">
+    <tr className="hover-red bg-white">
       <td>{contact.id}</td>
       <td>{contact.producttype}</td>
       <td>{contact.weight}</td>
@@ -17,14 +17,18 @@ const ReadOnlyRow = ({
 
       <td>
         <button
-          className="mr2"
+          className=" br-pill bw0 bg-orange white hover-bg-yellow tc pa3"
           type="button"
           onClick={(event) => handleEditClick(event, contact)}
         >
           Edit
         </button>
 
-        <button type="button" onClick={() => handleDeleteClick(contact.email)}>
+        <button
+          className="ml2 br-pill bw0 bg-dark-red hover-bg-red white pa2 "
+          type="button"
+          onClick={() => handleDeleteClick(contact.email)}
+        >
           Delete
         </button>
       </td>

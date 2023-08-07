@@ -5,7 +5,7 @@ import { Circles } from "react-loader-spinner";
 const EditableRow = ({
   handleEditFormSubmit,
   isLoadingSave,
-  editFormData,
+
   handleEditFormChange,
   handleCancelClick,
 }) => {
@@ -16,16 +16,16 @@ const EditableRow = ({
         <input
           type="text"
           required="required"
-          placeholder="Enter product"
-          name="product"
+          placeholder="Edit product type"
+          name="producttype"
           onChange={handleEditFormChange}
         ></input>
       </td>
       <td>
         <input
-          type="text"
+          type="number"
           required="required"
-          placeholder="Enter Weight"
+          placeholder="Edit Weight"
           name="weight"
           onChange={handleEditFormChange}
         ></input>
@@ -35,7 +35,7 @@ const EditableRow = ({
         <input
           type="text"
           placeholder="Edit company"
-          name="company"
+          name="companyname"
           onChange={handleEditFormChange}
         ></input>
       </td>
@@ -43,7 +43,7 @@ const EditableRow = ({
         <input
           type="text"
           placeholder="Edit fullname"
-          name="username"
+          name="fullname"
           onChange={handleEditFormChange}
         ></input>
       </td>
@@ -56,10 +56,17 @@ const EditableRow = ({
             <Circles type="Oval" color="#000080" height={20} width={40} />
           </div>
         ) : null}
-        <button onClick={handleEditFormSubmit} className="mr2">
+        <button
+          onClick={handleEditFormSubmit}
+          className="ml2 br-pill bw0 bg-orange hover-bg-yellow white pa2"
+        >
           Save
         </button>
-        <button type="button" onClick={handleCancelClick}>
+        <button
+          className="ml2 br-pill bw0 bg-orange hover-bg-yellow white pa2"
+          type="button"
+          onClick={handleCancelClick}
+        >
           Cancel
         </button>
       </td>
