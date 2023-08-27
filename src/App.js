@@ -23,6 +23,7 @@ import Home from "./components/home/Home";
 //footer and headers
 import Footer from "./components/topHeader/Footer";
 import AdminDashboardHeader from "./components/topHeader/AdminDashboardHeader";
+import FieldAdminDashboardHeader from "./components/topHeader/FieldAdminDashboardHeader";
 
 //users
 import Users from "./components/admin/users/Users";
@@ -54,6 +55,9 @@ import UserNavModal from "./components/topHeader/UserNavModal";
 
 //Admin nav modal
 import AdminNavModal from "./components/topHeader/AdminNavModal";
+
+//FieldAdmin nav modal
+import FieldAdminNavModal from "./components/topHeader/FieldAdminNavModal";
 
 //records populated in calender view
 import RecordsCalender from "./components/user/recordsCalender/RecordsCalender";
@@ -87,19 +91,28 @@ function App() {
   sessiontype = Cookies.get("sessiontype");
 
   try {
-    if (userCookie.length >= 8) {
+    if (userCookie.length >= 8 && sessiontype === "farmer") {
       isAdmin = false;
       isUser = true;
+      isFieldAdmin = false;
       loginStatus = "isUser";
       console.log("user user is logged in " + loginStatus);
-    } else if (adminCookie.length >= 8) {
+    } else if (adminCookie.length >= 8 && sessiontype === "admin") {
       isAdmin = true;
       isUser = false;
+      isFieldAdmin = false;
       loginStatus = "isAdmin";
+      console.log("user is logged in " + loginStatus);
+    } else if (adminCookie.length >= 8 && sessiontype === "fieldAdmin") {
+      isAdmin = false;
+      isUser = false;
+      isFieldAdmin = true;
+      loginStatus = "isFieldAdmin";
       console.log("user is logged in " + loginStatus);
     } else {
       isAdmin = false;
       isUser = false;
+      isFieldAdmin = false;
       loginStatus = "";
     }
   } catch (error) {}
@@ -334,7 +347,10 @@ function App() {
         <Router>
           <div className="Ap    ">
             {/* <AdminDashboardHeader /> */}
-            <AdminDashboardHeader toggleModal={toggleModal} isOpen={isOpen} />
+            <FieldAdminDashboardHeader
+              toggleModal={toggleModal}
+              isOpen={isOpen}
+            />
 
             <AdminNavModal toggleModal={toggleModal} isOpen={isOpen} />
 
