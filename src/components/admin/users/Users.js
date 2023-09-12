@@ -17,8 +17,11 @@ const Users = () => {
   const [contacts, setContacts] = useState(data);
   const [addFormData, setAddFormData] = useState({
     username: "",
+    farmerid: "",
     email: "",
-
+    fullname: "",
+    firstName: "",
+    lastName: "",
     company: "",
     category: "",
     phone: "",
@@ -63,6 +66,7 @@ const Users = () => {
 
   const [names, setNames] = useState({
     fullname: "",
+    farmerid: "",
     category: options[0].value,
     username: "",
     company: "",
@@ -87,6 +91,8 @@ const Users = () => {
   //accept numbers only
 
   //clear inputs
+  const firstnameref = useRef();
+  const lastnameref = useRef();
   const fullnameRef = useRef();
   const usernameRef = useRef();
   const emailRef = useRef();
@@ -94,6 +100,52 @@ const Users = () => {
   const phoneRef = useRef();
   const companyRef = useRef();
   const categoryRef = useRef();
+
+  //creating a fullname formatter here so that fullname data goes into the dataabase in the
+  //form of firstname Lastname
+  // Function to format the full name
+  const formatFullName = (firstName, lastName) => {
+    // Ensure the first letter of each name is capitalized
+    const formattedFirstName =
+      firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    const formattedLastName =
+      lastName.charAt(0).toUpperCase() + lastName.slice(1);
+
+    // Combine the formatted names into the full name
+    const fullName = `${formattedFirstName} ${formattedLastName}`;
+
+    return fullName;
+  };
+
+  //format the company to start with capital letter and remove white spaces
+  // Function to format the company name
+  const formatCompanyName = (input) => {
+    // Remove leading and trailing white spaces
+    const trimmedInput = input.trim();
+
+    // Ensure the first letter is capitalized
+    const formattedCompanyName =
+      trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
+
+    return formattedCompanyName;
+  };
+
+  //handle company input
+  const onCompanyChange = (event) => {
+    if (names.company.length >= 3) {
+      setFoundErrAdd("");
+    } else {
+      setFoundErrAdd("An error occurred");
+    }
+    const newCompanyName = event.target.value;
+    const formattedCompanyName = formatCompanyName(newCompanyName);
+
+    // Spreading "...state" ensures we don't "lose" fname,lname,email... etc
+    setNames((names) => ({
+      ...names,
+      company: formattedCompanyName,
+    }));
+  };
 
   // handle on category change
   const handleCategoryEdit = (event) => {
@@ -110,8 +162,6 @@ const Users = () => {
 
     const newFormData = { ...editFormData };
     newFormData["category"] = category;
-
-    console.log(newFormData);
 
     setEditFormData(newFormData);
   };
@@ -132,15 +182,11 @@ const Users = () => {
     const newFormData = { ...editFormData };
     newFormData["status"] = status;
 
-    console.log(newFormData);
-
     setEditFormData(newFormData);
   };
 
   //handle category input
   const onCategoryChange = (event) => {
-    // console.log(event.target.value);
-
     setSuccess(null);
     setNames((names) => ({
       ...names,
@@ -154,8 +200,6 @@ const Users = () => {
 
     const newFormData = { ...addFormData };
     newFormData["category"] = category;
-
-    console.log(newFormData);
 
     setAddFormData(newFormData);
   };
@@ -174,19 +218,17 @@ const Users = () => {
     const newFormData = { ...addFormData };
     newFormData["category"] = category;
 
-    console.log(newFormData);
-
     setAddFormData(newFormData);
   };
   useEffect(() => {
-    //fetch agents
+    //fetch users
     const fetchAll = () => {
       let adminCookie = Cookies.get("sessionidadmin");
       if (adminCookie.length >= 1) {
         setIsLoading(true);
 
         setTimeout(() => {
-          fetch("http://localhost:8000/getusers", {
+          fetch("https://api.terraweb.africa/getusers", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
@@ -240,7 +282,78 @@ const Users = () => {
       }
     };
 
+    //load profile
+    const fetchProfile = () => {
+      let adminCookie = "";
+      adminCookie = Cookies.get("sessionidadmin");
+      let userid = "";
+      userid = Cookies.get("sessioniduser");
+      if (adminCookie.length >= 1 || userid.length >= 1) {
+        setIsLoading(true);
+        setTimeout(() => {
+          fetch("https://api.terraweb.africa/loadProfile", {
+            method: "post",
+            headers: { "Content-Type": "application/JSON" },
+            body: JSON.stringify({
+              adminid: adminCookie,
+              userid: userid,
+            }),
+          })
+            .then(function (response) {
+              if (response.status === 400) {
+                throw Error("Wrong credentials");
+              }
+              if (response === 500) {
+                throw Error("Could not complete request because of an error");
+              }
+
+              return response.json();
+            })
+            .then((user) => {
+              if (user[0].username.length >= 1) {
+                //load data
+
+                setFoundErrAdd(null);
+
+                setIsLoading(null);
+                setContacts(user);
+
+                setSuccess(null);
+                setDeleteState(null);
+
+                //store a name after load to display in the title of the users table
+                setNames((names) => ({
+                  ...names,
+                  company: user[0].company,
+                }));
+
+                setAddFormData((prevState) => ({
+                  ...prevState,
+                  company: user[0].company,
+                }));
+                companyRef.current.value = user[0].company;
+              } else {
+                //dont load
+
+                setFoundErrAdd(null);
+                setFoundErr(null);
+                setIsLoading(null);
+                setDeleteState(null);
+              }
+            })
+            .catch((err) => {
+              // setFoundErr(err.message);
+              setIsLoading(null);
+              // setFlag(1);
+            });
+        }, 150);
+      } else {
+        setIsLoading(null);
+      }
+    };
+
     fetchAll();
+    fetchProfile();
   }, []);
 
   //load analysis
@@ -264,7 +377,7 @@ const Users = () => {
       setIsLoading(true);
 
       setTimeout(() => {
-        fetch("http://localhost:8000/searchUsers", {
+        fetch("https://api.terraweb.africa/searchUsers", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
@@ -287,7 +400,6 @@ const Users = () => {
             return response.json();
           })
           .then((user) => {
-            console.log(user);
             if (user[0].id >= 1) {
               setFoundErr(null);
               setFoundErrAdd(null);
@@ -326,7 +438,7 @@ const Users = () => {
       setIsLoading(true);
 
       setTimeout(() => {
-        fetch("http://localhost:8000/getusers", {
+        fetch("https://api.terraweb.africa/getusers", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
@@ -344,7 +456,6 @@ const Users = () => {
             return response.json();
           })
           .then((user) => {
-            console.log(user);
             if (user[0].id >= 1) {
               setFoundErr(null);
               setFoundErrAdd(null);
@@ -375,6 +486,7 @@ const Users = () => {
     }
   };
 
+  //temp handle add form change
   const handleAddFormChange = (event) => {
     event.preventDefault();
 
@@ -382,12 +494,46 @@ const Users = () => {
     setFoundErrAdd(null);
 
     const fieldName = event.target.getAttribute("name");
-    const fieldValue = event.target.value;
+    let fieldValue = event.target.value;
 
-    const newFormData = { ...addFormData };
-    newFormData[fieldName] = fieldValue;
+    // Check if the field name is "company" and apply formatting if needed
+    if (fieldName === "company") {
+      // Ensure the first letter is capitalized
+      fieldValue = fieldValue.charAt(0).toUpperCase() + fieldValue.slice(1);
 
-    setAddFormData(newFormData);
+      // Remove trailing white spaces
+      fieldValue = fieldValue.trim();
+      setAddFormData((prevState) => ({
+        ...prevState,
+        company: fieldValue,
+      }));
+    } else if (fieldName === "firstName") {
+      // Handle input changes for first name
+      if (/^[A-Za-z]+$/.test(fieldValue) || fieldValue === "") {
+        const fullName = formatFullName(fieldValue, addFormData.firstName);
+
+        setAddFormData((prevState) => ({
+          ...prevState,
+          firstName: fieldValue,
+          fullname: fullName,
+        }));
+      }
+    } else if (fieldName === "lastName") {
+      // Handle input changes for last name
+      if (/^[A-Za-z]+$/.test(fieldValue) || fieldValue === "") {
+        const fullName = formatFullName(addFormData.firstName, fieldValue);
+        setAddFormData((prevState) => ({
+          ...prevState,
+          lastName: fieldValue,
+          fullname: fullName,
+        }));
+      }
+    } else {
+      const newFormData = { ...addFormData };
+      newFormData[fieldName] = fieldValue;
+
+      setAddFormData(newFormData);
+    }
   };
 
   const handleEditFormChange = (event) => {
@@ -414,8 +560,12 @@ const Users = () => {
     setSuccess(null);
     setFoundErrAdd(null);
 
+    console.log(addFormData.company);
+    console.log(addFormData);
+
     const newContact = {
       username: addFormData.username,
+      farmerid: addFormData.farmerid,
       email: addFormData.email,
       password: addFormData.password,
       fullname: addFormData.fullname,
@@ -426,6 +576,7 @@ const Users = () => {
 
     if (
       newContact.username.length >= 1 &&
+      newContact.farmerid.length >= 1 &&
       newContact.email.length >= 1 &&
       newContact.password.length >= 8 &&
       newContact.company.length >= 1 &&
@@ -439,11 +590,12 @@ const Users = () => {
       if (adminCookie.length >= 1) {
         setIsLoadingAdd(true);
         setTimeout(() => {
-          fetch("http://localhost:8000/addUser", {
+          fetch("https://api.terraweb.africa/addUser", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
               adminid: adminCookie,
+              farmerid: newContact.farmerid,
               username: newContact.username,
               email: newContact.email,
               password: newContact.password,
@@ -456,7 +608,7 @@ const Users = () => {
             .then(function (response) {
               if (response.status === 400) {
                 throw Error(
-                  "An error occurred, check the details and try again or check if user exists"
+                  "A user with the same farmerid or details seems to already exist, or there seems to be an error."
                 );
               }
               if (response.status === 417) {
@@ -469,7 +621,6 @@ const Users = () => {
               return response.json();
             })
             .then((user) => {
-              console.log(user);
               if (user) {
                 setSuccess("success");
                 setFoundErrAdd(null);
@@ -486,14 +637,15 @@ const Users = () => {
                 usernameRef.current.value = "";
                 emailRef.current.value = "";
                 passwordRef.current.value = "";
-                //clear the add form array
-                addFormData.username = "";
-                addFormData.email = "";
-                addFormData.phone = "";
-                addFormData.fullname = "";
-                addFormData.company = "";
-                addFormData.category = "";
-                addFormData.password = "";
+                phoneRef.current.value = "";
+                // //clear the add form array
+                // addFormData.username = "";
+                // addFormData.email = "";
+                // addFormData.phone = "";
+                // addFormData.fullname = "";
+                // // addFormData.company = "";
+                // // addFormData.category = "";
+                // addFormData.password = "";
                 //load data
               } else {
                 setSuccess("not good");
@@ -519,7 +671,6 @@ const Users = () => {
         setIsLoadingAdd(null);
       }
     } else {
-      console.log(newContact);
     }
   };
 
@@ -528,6 +679,7 @@ const Users = () => {
     event.preventDefault();
     const editedContact = {
       id: editFormData.id,
+      farmerid: editFormData.farmerid,
       username: editFormData.username,
       email: editFormData.email,
       password: editFormData.password,
@@ -554,11 +706,12 @@ const Users = () => {
     if (adminCookie.length >= 4) {
       setIsLoadingSave(true);
       setTimeout(() => {
-        fetch("http://localhost:8000/updateUser", {
+        fetch("https://api.terraweb.africa/updateUser", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
             adminid: adminCookie,
+            farmerid: newContacts[index].farmerid,
             username: newContacts[index].username,
             email: newContacts[index].email,
             password: newContacts[index].password,
@@ -583,7 +736,6 @@ const Users = () => {
             return response.json();
           })
           .then((user) => {
-            console.log(user);
             if (user >= 1) {
               setFoundErr(null);
               setSuccess("success");
@@ -626,6 +778,7 @@ const Users = () => {
 
     const formValues = {
       id: contact.id,
+      farmerid: contact.farmerid,
       username: contact.username,
       email: contact.email,
       password: contact.password,
@@ -652,7 +805,7 @@ const Users = () => {
   const onDeleteYes = (contactemail, category) => {
     let adminCookie = Cookies.get("sessionidadmin");
     if (adminCookie.length >= 4) {
-      fetch("http://localhost:8000/deleteUser", {
+      fetch("https://api.terraweb.africa/deleteUser", {
         method: "post",
         headers: { "Content-Type": "application/JSON" },
         body: JSON.stringify({
@@ -673,7 +826,7 @@ const Users = () => {
           return response.json();
         })
         .then((user) => {
-          // console.log(user);
+          //
           setDeleteState(user);
 
           if (user) {
@@ -723,7 +876,6 @@ const Users = () => {
   const onSearchChange = (event) => {
     event.preventDefault();
     setSearchUser(event.target.value);
-    console.log(searchUser);
   };
   return (
     <div className="app-container center br4 mt6 shadow-3">
@@ -771,7 +923,7 @@ const Users = () => {
         </div>
         <div className="grid-item flex-ns pa3 mt2 ">
           <label className="f3  mt2">
-            Showing <b>1-50</b> of {contacts.count} Entries
+            Showing <b>1-50</b> of {contacts.length} Entries
           </label>
           <button
             className=" br-pill bw0 ml2 bg-white orange f4  b pa2 hover-bg-orange hover-white"
@@ -795,6 +947,7 @@ const Users = () => {
             <thead>
               <tr>
                 <th>admin ID</th>
+                <th>Farmer ID</th>
                 <th>Username</th>
                 <th>Email</th>
                 <th>Password</th>
@@ -852,15 +1005,60 @@ const Users = () => {
 
       <h2 className="f3 b white">Add a User</h2>
       <div className="d-flex bg-white pa2 br4 shadow-3">
-        <input
+        {/* <input
           ref={fullnameRef}
           type="text"
           name="fullname"
           required="required"
           placeholder="Enter fullname"
           onChange={handleAddFormChange}
-        />
+        /> */}
+        <div>
+          <h2>
+            <label className="b f4 ">Farmer ID</label>
+          </h2>
+          <input
+            // ref={firstnameref}
+            className="w-100 w-50-ns tl  "
+            placeholder="Farmer ID"
+            type="text"
+            name="farmerid"
+            onChange={handleAddFormChange}
+          />
+        </div>
+        <div>
+          <h2>
+            <label className="b f4 ">First Name</label>
+          </h2>
+          <input
+            ref={firstnameref}
+            className="w-100 w-50-ns  tl  "
+            placeholder="First Name"
+            type="text"
+            name="firstName"
+            // value={addFormData.firstName}
+            onChange={handleAddFormChange}
+          />
+        </div>
+        <div>
+          <h2>
+            <label className="b f4 ">Last Name</label>
+          </h2>
+          <input
+            ref={lastnameref}
+            className="w-100 w-50-ns  tl  "
+            placeholder="Last Name"
+            name="lastName"
+            type="text"
+            // value={addFormData.lastName}
+            onChange={handleAddFormChange}
+          />
+        </div>
+        <h2>
+          <label className="b f4 ">Username</label>
+        </h2>
         <input
+          className="w-100 w-50-ns  tl  "
           ref={usernameRef}
           type="text"
           name="username"
@@ -868,7 +1066,11 @@ const Users = () => {
           placeholder="Enter a username..."
           onChange={handleAddFormChange}
         />
+        <h2>
+          <label className="b f4 ">Email</label>
+        </h2>
         <input
+          className="w-100 w-50-ns  tl  "
           ref={emailRef}
           type="text"
           name="email"
@@ -876,7 +1078,11 @@ const Users = () => {
           placeholder="Enter email..."
           onChange={handleAddFormChange}
         />
+        <h2>
+          <label className="b f4 ">Password</label>
+        </h2>
         <input
+          className="w-100 w-50-ns  tl  "
           ref={passwordRef}
           type="text"
           name="password"
@@ -884,7 +1090,11 @@ const Users = () => {
           placeholder="Enter password..."
           onChange={handleAddFormChange}
         />
+        <h2>
+          <label className="b f4 ">Phone</label>
+        </h2>
         <input
+          className="w-100 w-50-ns tl  "
           ref={phoneRef}
           type="text"
           // pattern="[0-9]*"
@@ -897,12 +1107,26 @@ const Users = () => {
           name="phone"
           onChange={handleAddFormChange}
         ></input>
+        <h2>
+          <label className="b f4 ">Company</label>
+        </h2>
         <input
+          // className="w-100 w-50-ns tl  "
           ref={companyRef}
+          // type="text"
+          // name="company"
+          // required="required"
+          // placeholder="Enter Company..."
+          // value={addFormData.company}
+          // onChange={handleAddFormChange}
+          className="w-100 w-50-ns tl br-pill b black"
           type="text"
           name="company"
+          // defaultValue={names.company}
           required="required"
-          placeholder="Enter Company..."
+          disabled
+          // placeholder="Enter a company..."
+          // placeholder={names.company}
           onChange={handleAddFormChange}
         />
         <select

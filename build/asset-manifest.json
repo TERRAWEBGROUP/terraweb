@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "./static/css/main.e93e1247.css",
+    "main.js": "./static/js/main.ddabb4c2.js",
+    "static/js/787.247051f6.chunk.js": "./static/js/787.247051f6.chunk.js",
+    "static/media/hero.jpg": "./static/media/hero.087dd3208f84471ec3e1.jpg",
+    "static/media/terrawebLogo.png": "./static/media/terrawebLogo.409ebf3e1c9921ad26ec.png",
+    "index.html": "./index.html",
+    "main.e93e1247.css.map": "./static/css/main.e93e1247.css.map",
+    "main.ddabb4c2.js.map": "./static/js/main.ddabb4c2.js.map",
+    "787.247051f6.chunk.js.map": "./static/js/787.247051f6.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e93e1247.css",
+    "static/js/main.ddabb4c2.js"
+  ]
+}

@@ -48,18 +48,18 @@ export default function Footer({
     setEmail(event.target.value);
   }
   return (
-    <footer class="footer-section">
-      <div class="footer container">
-        <div class="footer__social-media">
+    <footer className="footer-section">
+      <div className="footer container">
+        <div className="footer__social-media">
           <img
             src="img/LOGO-FAVCON.png"
             alt="terraweb logo"
-            class="footer__social-media--logo"
+            className="footer__social-media--logo"
           />
         </div>
-        <div class="footer__other-links">
-          <h4 class="footer__other-links--heading">Other links</h4>
-          <div class="footer__other-links--links">
+        <div className="footer__other-links">
+          <h4 className="footer__other-links--heading">Other links</h4>
+          <div className="footer__other-links--links">
             <label className="footer__other-links--link hover-white">
               THis should be a link to somewhere
             </label>
@@ -77,23 +77,23 @@ export default function Footer({
             </label>
           </div>
         </div>
-        <div class="footer__team">
-          <h4 class="footer__team--heading">Our team</h4>
-          <ul class="footer__team--list">
-            <li class="footer__team--list-item">Member of terrraweb</li>
-            <li class="footer__team--list-item">Member of terrraweb</li>
-            <li class="footer__team--list-item">Member of terrraweb</li>
-            <li class="footer__team--list-item">Member of terrraweb</li>
-            <li class="footer__team--list-item">Member of terrraweb</li>
-            <li class="footer__team--list-item">Member of terrraweb</li>
-            <li class="footer__team--list-item">Member of terrraweb</li>
-            <li class="footer__team--list-item">Member of terrraweb</li>
+        <div className="footer__team">
+          <h4 className="footer__team--heading">Our team</h4>
+          <ul className="footer__team--list">
+            <li className="footer__team--list-item">Member of terrraweb</li>
+            <li className="footer__team--list-item">Member of terrraweb</li>
+            <li className="footer__team--list-item">Member of terrraweb</li>
+            <li className="footer__team--list-item">Member of terrraweb</li>
+            <li className="footer__team--list-item">Member of terrraweb</li>
+            <li className="footer__team--list-item">Member of terrraweb</li>
+            <li className="footer__team--list-item">Member of terrraweb</li>
+            <li className="footer__team--list-item">Member of terrraweb</li>
           </ul>
         </div>
 
-        <div class="footer__policy">
-          <h4 class="footer__policy--heading">Join Our Newsletter</h4>
-          <p class="footer__policy--text">
+        <div className="footer__policy">
+          <h4 className="footer__policy--heading">Join Our Newsletter</h4>
+          <p className="footer__policy--text">
             Your email is secure with us. We guarantee to send you notifications
             concerning important news about the plaform or your company that we
             think might be helpful to you.
@@ -103,13 +103,13 @@ export default function Footer({
               type="text"
               id="id"
               placeholder="Enter email"
-              class="login__input"
+              className="login__input"
               onChange={onEmailChange}
             />
             {/* <button className="btn btn-orange sign_in "> */}
             <button className="bg-orange pa2 f3 ml0 white b br-pill hover-bg-yellow">
               <label
-                class="link-orange"
+                className="link-orange"
                 // onClick={onSubmitSignin}
               >
                 Subscribe
@@ -174,7 +174,9 @@ export default function Footer({
           </label>
         </div>
       </div>
-      <div class="footer__copy">&copy; 2022 Terraweb. All rights reserved.</div>
+      <div className="footer__copy">
+        &copy; 2022 Terraweb. All rights reserved.
+      </div>
     </footer>
   );
 }

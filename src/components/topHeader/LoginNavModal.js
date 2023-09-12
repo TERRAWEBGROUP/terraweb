@@ -1,6 +1,7 @@
 import React from "react";
 
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
 
 import "./modalstyles.css";
 
@@ -10,26 +11,49 @@ import Modal from "react-modal";
 Modal.setAppElement("#root");
 
 export default function LoginNavModal(props) {
-  //browser history
-  // const navigate = useNavigate();
+  // browser history
+  // const history = useHistory();
+
+  //handle navigation
+  const navigate = useNavigate();
 
   const navigateHome = () => {
-    window.location.pathname = "/home";
+    // window.location.pathname = "/home";
+    navigate("/home");
+    props.toggleModal();
   };
   const navigateServices = () => {
-    window.location.pathname = "/services";
+    // window.location.pathname = "/services";
+    navigate("/services");
+    props.toggleModal();
   };
   const navigateBlog = () => {
-    window.location.pathname = "/blog";
+    // window.location.pathname = "/blog";
+    navigate("/blog");
+    props.toggleModal();
   };
   const navigateAbout = () => {
-    window.location.pathname = "/about";
+    // window.location.pathname = "/about";
+    navigate("/about");
+    props.toggleModal();
   };
-  const navigateLogin = () => {
-    window.location.pathname = "/login";
+  const navigateLogin = (e) => {
+    // window.location.pathname = "/login";
+    e.preventDefault();
+    // window.location.href = "/login";
+
+    // history.push("/login");
+    navigate("/login");
+    props.toggleModal();
   };
-  const navigateRegister = () => {
-    window.location.pathname = "/register";
+  const navigateRegister = (e) => {
+    // window.location.pathname = "/register";
+    e.preventDefault();
+    // window.location.href = "/register";
+
+    // history.push("/register");
+    navigate("/register");
+    props.toggleModal();
   };
 
   return (
@@ -51,51 +75,51 @@ export default function LoginNavModal(props) {
             className="fas fa-window-close f1 mr0"
           ></i>
         </div>
-        <ul class="modal_menu">
-          <li onClick={navigateHome} class="modal-link">
+        <ul className="modal_menu">
+          <li onClick={navigateHome} className="modal-link">
             <label>
-              <i class="fas fa-home"></i>
+              <i className="fas fa-home"></i>
               <span className="ml2">Home</span>
             </label>
           </li>
 
-          <li onClick={navigateServices} class="modal-link">
+          <li onClick={navigateServices} className="modal-link">
             <label>
               {/* <FontAwesomeIcon icon="fas fa-atlas" /> */}
-              <i class="fas fa-atlas"></i>
+              <i className="fas fa-atlas"></i>
               <span className="ml2">Services</span>
             </label>
 
             {/* caret for dropdown toggle */}
             <label id="dropdown-trigger">
-              <span class="caret-dropdown"></span>
+              <span className="caret-dropdown"></span>
             </label>
           </li>
 
-          <li onClick={navigateBlog} class="modal-link">
+          <li onClick={navigateBlog} className="modal-link">
             <label>
-              <i class="fas fa-blog"></i>
+              <i className="fas fa-blog"></i>
               <span className="ml2">Blog</span>
             </label>
           </li>
         </ul>
 
-        <ul class="modal_sub-menu">
-          <li onClick={navigateAbout} class="modal-link">
+        <ul className="modal_sub-menu">
+          <li onClick={navigateAbout} className="modal-link">
             <label>
               <i className="fas fa-solid fa-info-circle"></i>
               <span className="ml2">About</span>
             </label>
           </li>
-          <li onClick={navigateLogin} class="modal-link">
+          <li onClick={navigateLogin} className="modal-link">
             <label>
-              <i class="fas fa-sign-in-alt"></i>
+              <i className="fas fa-sign-in-alt"></i>
               <span className="ml2">Sign in</span>
             </label>
           </li>
-          <li onClick={navigateRegister} class="modal-link">
+          <li onClick={navigateRegister} className="modal-link">
             <label>
-              <i class="fas fa-user-plus"></i>
+              <i className="fas fa-user-plus"></i>
               <span className="ml2">Sign Up</span>
             </label>
           </li>

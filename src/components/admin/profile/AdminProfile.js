@@ -82,7 +82,7 @@ const AdminProfile = () => {
       if (adminCookie.length >= 1 || userid.length >= 1) {
         setIsLoading(true);
         setTimeout(() => {
-          fetch("http://localhost:8000/loadProfile", {
+          fetch("https://api.terraweb.africa/loadProfile", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
@@ -103,8 +103,7 @@ const AdminProfile = () => {
             .then((user) => {
               if (user[0].username.length >= 1) {
                 //load data
-                console.log(user);
-                console.log("found error" + user[0].username);
+
                 setFoundErrAdd(null);
 
                 setIsLoading(null);
@@ -142,7 +141,7 @@ const AdminProfile = () => {
   }, []);
 
   return (
-    <div className="container rounded bg-white   pa3 center br4 mt6 shadow-3">
+    <div className="container z-index:100 rounded bg-white  pa3 center br4 mt6 shadow-3">
       <div className="co-container flex ">
         <div className="col-md-3 border-right fl pv5 pa5">
           <div className="d-flex flex-column align-items-center text-center p-3 py-5 flex tc center">
@@ -185,7 +184,7 @@ const AdminProfile = () => {
                   type="text"
                   className="w-100"
                   placeholder="Full Name"
-                  value={contacts[0].fullname ? contacts[0].username : ""}
+                  value={contacts[0].fullname ? contacts[0].fullname : ""}
                 />
               </div>
             </div>

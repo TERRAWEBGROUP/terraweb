@@ -65,7 +65,7 @@ function Login() {
     } else {
       setIsLoading(true);
 
-      fetch("http://localhost:8000/login", {
+      fetch("https://api.terraweb.africa/tempLogin", {
         method: "post",
         headers: { "Content-Type": "application/JSON" },
         body: JSON.stringify({
@@ -87,13 +87,11 @@ function Login() {
           if (user.sessioniduser || user.sessionidadmin) {
             setFoundErr(null);
 
-            console.log(user);
             setIsLoading(null);
             // dispatch(loadUser(user[0].id));
 
             dispatch(loadUser(user));
 
-            // console.log(user[0]);
             // navigate("/users");
             window.location.pathname = "/";
             setFlag(1);
@@ -114,21 +112,21 @@ function Login() {
   };
 
   return (
-    <div class="logindiv">
-      {/* <section class="login__box"> */}
-      <div class="login__header">
+    <div className="logindiv">
+      {/* <section className="login__box"> */}
+      <div className="login__header">
         <img
           src="img/WHITE LOGO.png"
           alt="terraweb white logo"
-          class="login__header--image"
+          className="login__header--image"
         />
       </div>
-      <div class="login__main">
+      <div className="login__main">
         <input
           type="text"
-          id="id"
+          id="emailinput"
           placeholder="Enter email"
-          class="login__input"
+          className="login__input"
           onChange={onEmailChange}
         />
         {emailError === "not valid" ? (
@@ -138,7 +136,7 @@ function Login() {
           type="password"
           id="passwordsgn"
           placeholder="Password"
-          class="login__input"
+          className="login__input"
           onChange={onPasswordChange}
         />
         {flag === 2 ? (
@@ -158,7 +156,7 @@ function Login() {
             <button className="btn btn-orange sign_in ">
               <label
                 href="login.html"
-                class="link-orange"
+                className="link-orange"
                 onClick={onSubmitSignin}
               >
                 Sign In
@@ -171,7 +169,10 @@ function Login() {
             </button>
 
             <button className="btn btn-white">
-              <label onClick={() => navigate("/register")} class="link-white">
+              <label
+                onClick={() => navigate("/register")}
+                className="link-white"
+              >
                 SignUp
               </label>
             </button>

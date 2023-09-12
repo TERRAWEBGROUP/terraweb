@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 import "./modalstyles.css";
 
@@ -10,8 +11,8 @@ import Modal from "react-modal";
 Modal.setAppElement("#root");
 
 export default function FieldAdminNavModal(props) {
-  //   //browser history
-  //   const navigate = useNavigate();
+  //browser history
+  const navigate = useNavigate();
 
   //dropdown toggle users
   const [dropdownActiveUsers, setdropdownActiveUsers] = useState(false);
@@ -28,24 +29,36 @@ export default function FieldAdminNavModal(props) {
   }
 
   const navigateHome = () => {
-    window.location.pathname = "/home";
+    // window.location.pathname = "/home";
+    navigate("/home");
+    props.toggleModal();
   };
 
   const navigateMessages = () => {
-    window.location.pathname = "/messages";
+    // window.location.pathname = "/messages";
+    navigate("/messages");
+    props.toggleModal();
   };
   const navigateProfile = () => {
-    window.location.pathname = "/profile";
+    // window.location.pathname = "/profile";
+    navigate("/profile");
+    props.toggleModal();
   };
   const navigateRecords = () => {
-    window.location.pathname = "/records";
+    // window.location.pathname = "/records";
+    navigate("/records");
+    props.toggleModal();
   };
 
   const navigateDailyRecord = () => {
-    window.location.pathname = "/records";
+    // window.location.pathname = "/records";
+    navigate("/records");
+    props.toggleModal();
   };
   const navigateSummary = () => {
-    window.location.pathname = "/records";
+    // window.location.pathname = "/records";
+    navigate("/records");
+    props.toggleModal();
   };
   const handleLogout = () => {
     //remove all cookies
@@ -81,33 +94,33 @@ export default function FieldAdminNavModal(props) {
             className="fas fa-window-close f1 mr0"
           ></i>
         </div>
-        <ul class="modal_menu">
-          <li onClick={navigateHome} class="modal-link">
+        <ul className="modal_menu">
+          <li onClick={navigateHome} className="modal-link">
             <label>
-              <i class="fas fa-home"></i>
+              <i className="fas fa-home"></i>
               <span className="ml2">Home</span>
             </label>
           </li>
         </ul>
 
-        <ul class="modal_sub-menu">
-          <li onClick={navigateMessages} class="modal-link">
+        <ul className="modal_sub-menu">
+          <li onClick={navigateMessages} className="modal-link">
             <label>
               <i className="fas fa-solid fa-comment-dots"></i>
               <span className="ml2">Messages</span>
             </label>
           </li>
-          <li onClick={navigateProfile} class="modal-link">
+          <li onClick={navigateProfile} className="modal-link">
             <label>
-              <i class="fas fa-user-circle"></i>
+              <i className="fas fa-user-circle"></i>
               <span className="ml2">My profile</span>
             </label>
           </li>
 
           <div className="caret flex ">
-            <li onClick={toggleDropdown} class="modal-link">
+            <li onClick={toggleDropdown} className="modal-link">
               <label>
-                <i class="fas fa-clipboard"></i>
+                <i className="fas fa-clipboard"></i>
                 <span className="ml2">Records</span>
               </label>
             </li>
@@ -117,8 +130,8 @@ export default function FieldAdminNavModal(props) {
                 <label className="dropdown-label">
                   <span
                     onClick={toggleDropdown}
-                    className="dropdown-trigger-down"
-                    class="fas fa-caret-square-down"
+                    // className="dropdown-trigger-down"
+                    className="fas fa-caret-square-down"
                   ></span>
                 </label>
               </div>
@@ -129,8 +142,8 @@ export default function FieldAdminNavModal(props) {
 
                 <label onClick={toggleDropdown} className="dropdown-label">
                   <span
-                    className="dropdown-trigger-up"
-                    class="fas fa-caret-square-up"
+                    // className="dropdown-trigger-up"
+                    className="fas fa-caret-square-up"
                   ></span>
                 </label>
               </div>
@@ -139,23 +152,23 @@ export default function FieldAdminNavModal(props) {
           {dropdownActive ? (
             <div className="ml5 w-30">
               <label onClick={navigateRecords}>
-                <i class=""></i>
+                <i className=""></i>
                 <span className="ml2">New Record</span>
               </label>
               <label onClick={navigateDailyRecord}>
-                <i class=""></i>
+                <i className=""></i>
                 <span className="ml2">Daily Records</span>
               </label>
               <label onClick={navigateSummary}>
-                <i class=""></i>
+                <i className=""></i>
                 <span className="ml2">Summary</span>
               </label>
             </div>
           ) : null}
 
-          <li onClick={handleLogout} class="modal-link">
+          <li onClick={handleLogout} className="modal-link">
             <label>
-              <i class="fas fa-sign-out-alt"></i>
+              <i className="fas fa-sign-out-alt"></i>
               <span className="ml2">Logout</span>
             </label>
           </li>

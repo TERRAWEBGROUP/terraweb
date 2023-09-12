@@ -20,8 +20,6 @@ const Summary = () => {
     email: "",
     password: "",
     created: "",
-    earnings: "",
-    availableAccs: "",
   });
 
   const [editFormData, setEditFormData] = useState({
@@ -30,8 +28,6 @@ const Summary = () => {
     email: "",
     password: "",
     created: "",
-    earnings: "",
-    availableAccs: "",
   });
 
   const [editContactId, setEditContactId] = useState(null);
@@ -60,7 +56,7 @@ const Summary = () => {
         setIsLoading(true);
 
         setTimeout(() => {
-          fetch("https://peaceful-lake-35455.herokuapp.com/myagents", {
+          fetch("https://peaceful-lake-35455.herokuapp.com/getrecords", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
@@ -78,7 +74,6 @@ const Summary = () => {
               return response.json();
             })
             .then((user) => {
-              console.log(user);
               if (user[0].id >= 1) {
                 setFoundErr(null);
 
@@ -120,14 +115,14 @@ const Summary = () => {
     settotalActiveRecords(count);
   };
 
-  //fetch agents
-  const fetchAgents = () => {
+  //fetch records
+  const fetchRecords = () => {
     let adminCookie = Cookies.get("tokken");
     if (adminCookie >= 1) {
       setIsLoading(true);
 
       setTimeout(() => {
-        fetch("https://peaceful-lake-35455.herokuapp.com/myagents", {
+        fetch("https://peaceful-lake-35455.herokuapp.com/getrecords", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
@@ -145,7 +140,6 @@ const Summary = () => {
             return response.json();
           })
           .then((user) => {
-            console.log(user);
             if (user[0].id >= 1) {
               setFoundErr(null);
 
@@ -188,7 +182,7 @@ const Summary = () => {
     event.preventDefault();
 
     const fieldName = event.target.getAttribute("name");
-    console.log("my field name ", fieldName);
+
     const fieldValue = event.target.value;
 
     const newFormData = { ...editFormData };
@@ -198,8 +192,8 @@ const Summary = () => {
   };
 
   //refresh after add records
-  const refreshAgents = () => {
-    fetchAgents();
+  const refreshRecords = () => {
+    fetchRecords();
   };
 
   const handleAddFormSubmit = (event) => {
@@ -222,7 +216,7 @@ const Summary = () => {
       if (adminCookie >= 1) {
         setIsLoadingAdd(true);
         setTimeout(() => {
-          fetch("https://peaceful-lake-35455.herokuapp.com/addmyagent", {
+          fetch("https://peaceful-lake-35455.herokuapp.com/addrecord", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
@@ -243,7 +237,6 @@ const Summary = () => {
               return response.json();
             })
             .then((user) => {
-              console.log(user);
               if (user) {
                 setFoundErr(null);
 
@@ -251,7 +244,7 @@ const Summary = () => {
                 // setContacts(user);
 
                 //refresh data
-                refreshAgents();
+                refreshRecords();
 
                 //clear textboxes
                 usernameRef.current.value = "";
@@ -301,7 +294,6 @@ const Summary = () => {
 
     // setContacts(newContacts);
     // setEditContactId(null);
-    console.log(newContacts[index].id);
 
     //send add agent request
 
@@ -309,7 +301,7 @@ const Summary = () => {
     if (adminCookie >= 1) {
       setIsLoadingSave(true);
       setTimeout(() => {
-        fetch("https://peaceful-lake-35455.herokuapp.com/updateagent", {
+        fetch("https://peaceful-lake-35455.herokuapp.com/updaterecord", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
@@ -317,7 +309,6 @@ const Summary = () => {
             username: newContacts[index].username,
             email: newContacts[index].email,
             password: newContacts[index].password,
-            earnings: newContacts[index].earnings,
           }),
         })
           .then(function (response) {
@@ -331,13 +322,12 @@ const Summary = () => {
             return response.json();
           })
           .then((user) => {
-            console.log(user);
             if (user[0].id >= 1) {
               setFoundErr(null);
 
               setIsLoadingSave(null);
 
-              refreshAgents();
+              refreshRecords();
               setEditContactId(null);
               //load data
             } else {
@@ -381,11 +371,11 @@ const Summary = () => {
     setEditContactId(null);
   };
 
-  //confirm delete agent
+  //confirm delete record
   const onDeleteYes = (contactemail) => {
     let adminCookie = Cookies.get("tokken");
     if (adminCookie >= 1) {
-      fetch("https://peaceful-lake-35455.herokuapp.com/deleteagent", {
+      fetch("https://api.terraweb.africa/deleterecord", {
         method: "post",
         headers: { "Content-Type": "application/JSON" },
         body: JSON.stringify({
@@ -405,10 +395,8 @@ const Summary = () => {
           return response.json();
         })
         .then((user) => {
-          console.log(user);
-
           if (user) {
-            refreshAgents();
+            refreshRecords();
           } else {
             //dont load
           }
@@ -426,9 +414,11 @@ const Summary = () => {
       customUI: ({ onClose }) => {
         return (
           <div className="bg-white br3 bb b--black-10   pa2 w-100 shadow-5 center ">
-            <h1>Confirm Delete Agent</h1>
-            <p>Sure you want to delete this agent record?</p>
-            <p className="b red f5">Note that this is undoable.</p>
+            <h1>Confirm Delete Record</h1>
+            <p>Sure you want to delete this user record?</p>
+            <p className="b red f5">
+              Note that this cannot be <b className="red f3">UNDONE</b>
+            </p>
             <label
               className="dib w3 tc pa2 ma2 white br-pill bg-red "
               onClick={onClose}
@@ -494,7 +484,7 @@ const Summary = () => {
 
         <button
           className="ml2 br-pill bg-white orange f3 pa3 b mt2 hover-bg-orange hover-white"
-          onClick={refreshAgents}
+          onClick={refreshRecords}
         >
           Refresh
         </button>

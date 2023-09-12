@@ -23,6 +23,7 @@ import Home from "./components/home/Home";
 //footer and headers
 import Footer from "./components/topHeader/Footer";
 import AdminDashboardHeader from "./components/topHeader/AdminDashboardHeader";
+import TerrawebAdminDashboardHeader from "./components/topHeader/TerrawebAdminDashboardHeader";
 import FieldAdminDashboardHeader from "./components/topHeader/FieldAdminDashboardHeader";
 
 //users
@@ -56,11 +57,16 @@ import UserNavModal from "./components/topHeader/UserNavModal";
 //Admin nav modal
 import AdminNavModal from "./components/topHeader/AdminNavModal";
 
+//m admin nav modal
+import TerrawebAdminNavModal from "./components/topHeader/TerrawebAdminNavModal";
+
 //FieldAdmin nav modal
 import FieldAdminNavModal from "./components/topHeader/FieldAdminNavModal";
 
 //records populated in calender view
 import RecordsCalender from "./components/user/recordsCalender/RecordsCalender";
+import TwRecords from "./components/twAdmin/twRecords/TwRecords";
+import TwUsers from "./components/twAdmin/twUsers/TwUsers";
 
 // import MyAccount from "./components/myAccount/MyAccount";
 
@@ -80,6 +86,7 @@ function App() {
   let isAdmin = false;
   let isFieldAdmin = false;
   let isUser = false;
+  let isTwAdmin = false;
 
   let userCookie = "";
   userCookie = Cookies.get("sessioniduser");
@@ -92,23 +99,33 @@ function App() {
 
   try {
     if (userCookie.length >= 8 && sessiontype === "farmer") {
+      let isTwAdmin = false;
+
       isAdmin = false;
       isUser = true;
       isFieldAdmin = false;
       loginStatus = "isUser";
-      console.log("user user is logged in " + loginStatus);
     } else if (adminCookie.length >= 8 && sessiontype === "admin") {
+      let isTwAdmin = false;
+
       isAdmin = true;
       isUser = false;
       isFieldAdmin = false;
       loginStatus = "isAdmin";
-      console.log("user is logged in " + loginStatus);
     } else if (adminCookie.length >= 8 && sessiontype === "fieldAdmin") {
+      let isTwAdmin = false;
+
       isAdmin = false;
       isUser = false;
       isFieldAdmin = true;
       loginStatus = "isFieldAdmin";
-      console.log("user is logged in " + loginStatus);
+    } else if (adminCookie.length >= 8 && sessiontype === "twAdmin") {
+      let isTwAdmin = true;
+
+      isAdmin = false;
+      isUser = false;
+      isFieldAdmin = false;
+      loginStatus = "twAdmin";
     } else {
       isAdmin = false;
       isUser = false;
@@ -119,25 +136,36 @@ function App() {
 
   try {
     if (sessiontype === "farmer") {
+      isTwAdmin = false;
       isAdmin = false;
       isUser = true;
       isFieldAdmin = false;
       loginStatus = "isUser";
-      console.log("user user is logged in " + loginStatus);
     } else if (sessiontype === "fieldAdmin") {
+      isTwAdmin = false;
+
       isAdmin = false;
       isUser = false;
-      isFieldAdmin = false;
+      isFieldAdmin = true;
       loginStatus = "isFieldAdmin";
-      console.log("field admin is logged in " + loginStatus);
     } else if (sessiontype === "admin") {
+      isTwAdmin = false;
+
       isAdmin = true;
       isUser = false;
 
       isFieldAdmin = false;
       loginStatus = "isAdmin";
-      console.log("Admin is logged in " + loginStatus);
+    } else if (sessiontype === "twAdmin") {
+      isTwAdmin = true;
+
+      isAdmin = false;
+      isUser = false;
+
+      isFieldAdmin = false;
+      loginStatus = "isTwAdmin";
     } else {
+      isTwAdmin = false;
       isAdmin = false;
       isUser = false;
       isFieldAdmin = false;
@@ -216,10 +244,143 @@ function App() {
 
   function toggleModal() {
     setIsOpen(!isOpen);
-    console.log("The nav is open" + isOpen);
   }
 
   switch (loginStatus) {
+    case "isTwAdmin":
+      return (
+        <Router>
+          <div className="Ap    ">
+            {/* <AdminDashboardHeader /> */}
+            <TerrawebAdminDashboardHeader
+              toggleModal={toggleModal}
+              isOpen={isOpen}
+            />
+
+            <TerrawebAdminNavModal toggleModal={toggleModal} isOpen={isOpen} />
+
+            {/* <div class="main__top-bar">
+              <div class="main__top-bar--balance">
+                <span> Ready to update data for 22 April</span>
+              </div>
+              <div class="main__top-bar--user">
+                <p class="user">
+                  {" "}
+                  Welcome back, <span class="user-name">User Admin 1</span>
+                </p>
+                <image
+                  src="img/user-6.jpg"
+                  alt="user image"
+                  class="user-image"
+                />
+                <a href="index.html" class="user-link">
+                  Log out
+                </a>
+              </div>
+            </div> */}
+            <Routes>
+              <Route exact path="/home" element={<Homepage />}></Route>
+
+              <Route
+                exact
+                path="/users/newuser"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <NewUser />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/users/deleteuser"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <DeleteUser />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/users"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <TwUsers />
+                  </section>
+                }
+              ></Route>
+              {/* <Route exact path="/messages" element={<Messages />}></Route> */}
+              <Route
+                exact
+                path="/records/newrecord"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <NewRecord />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/records/summary"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <Summary />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/dailyrecords"
+                element={
+                  <section className="coolbg pa1 pa1-m w-100-l">
+                    <TwRecords />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/records"
+                element={
+                  <section className="coolbg pa1 pa1-m w-100-l">
+                    <TwRecords />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="/profile"
+                element={
+                  <section className="coobg pa1 pa1-m">
+                    <AdminProfile />
+                  </section>
+                }
+              ></Route>
+              <Route
+                exact
+                path="*"
+                element={
+                  <section className=" center">
+                    <Home
+                      setAboutTerraweb={setAboutTerraweb}
+                      setBlog={setBlog}
+                      setServices={setServices}
+                      setTerms={setTerms}
+                    />
+                  </section>
+                }
+              ></Route>
+            </Routes>
+            <Footer
+              executeScroll={executeScroll}
+              executeScroll2={executeScroll2}
+              executeScroll3={executeScroll3}
+              executeScroll4={executeScroll4}
+              executeScroll5={executeScroll5}
+              executeScroll6={executeScroll6}
+            />
+          </div>
+        </Router>
+      );
+    case "isFieldAdmin":
     case "isAdmin":
       return (
         <Router>
@@ -301,7 +462,7 @@ function App() {
                 exact
                 path="/dailyrecords"
                 element={
-                  <section className="coolbg pa1 pa1-m w-90">
+                  <section className="coolbg pa1 pa1-m w-100-l">
                     <Records />
                   </section>
                 }
@@ -310,12 +471,20 @@ function App() {
                 exact
                 path="/records"
                 element={
-                  <section className="coolbg pa1 pa1-m w-90">
+                  <section className="coolbg pa1 pa1-m w-100-l">
                     <Records />
                   </section>
                 }
               ></Route>
-              <Route exact path="/profile" element={<AdminProfile />}></Route>
+              <Route
+                exact
+                path="/profile"
+                element={
+                  <section className="coobg pa1 pa1-m">
+                    <AdminProfile />
+                  </section>
+                }
+              ></Route>
               <Route
                 exact
                 path="*"
@@ -426,7 +595,7 @@ function App() {
                 exact
                 path="/dailyrecords"
                 element={
-                  <section className="coolbg pa1 pa1-m w-90">
+                  <section className="coolbg pa1 pa1-m w-100-l">
                     <Records />
                   </section>
                 }
@@ -435,12 +604,20 @@ function App() {
                 exact
                 path="/records"
                 element={
-                  <section className="coolbg pa1 pa1-m w-90">
+                  <section className="coolbg pa1 pa1-m w-100-l">
                     <Records />
                   </section>
                 }
               ></Route>
-              <Route exact path="/profile" element={<AdminProfile />}></Route>
+              <Route
+                exact
+                path="/profile"
+                element={
+                  <section className="coolbg pa1 pa1-m">
+                    <AdminProfile />
+                  </section>
+                }
+              ></Route>
               <Route
                 exact
                 path="*"
@@ -506,7 +683,15 @@ function App() {
                   </section>
                 }
               ></Route>
-              <Route exact path="/profile" element={<AdminProfile />}></Route>
+              <Route
+                exact
+                path="/profile"
+                element={
+                  <section className="coolbg pa1-m pa1">
+                    <AdminProfile />
+                  </section>
+                }
+              ></Route>
               <Route
                 exact
                 path="*"

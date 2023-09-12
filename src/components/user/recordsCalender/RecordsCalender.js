@@ -3,7 +3,7 @@
 // import parse from "date-fns/parse";
 // import startOfWeek from "date-fns/startOfWeek";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 import Cookies from "js-cookie";
 
@@ -63,6 +63,8 @@ function RecordsCalender() {
   // const [allEvents, setAllEvents] = useState(events);
   const [allEvents, setAllEvents] = useState(events);
 
+  // const [eventsAI, setEventsAI] = useState([]);
+
   function handleAddEvent() {
     for (let i = 0; i < allEvents.length; i++) {
       const d1 = new Date(allEvents[i].start);
@@ -100,7 +102,7 @@ function RecordsCalender() {
         setIsLoading(true);
 
         setTimeout(() => {
-          fetch("http://localhost:8000/getRecords", {
+          fetch("https://api.terraweb.africa/getRecords", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
@@ -119,26 +121,35 @@ function RecordsCalender() {
             })
             .then((user) => {
               if (user[0].id >= 1) {
+                //load data
+
                 setFoundErr(null);
 
                 setIsLoading(null);
-                // setContacts(user);
-                // loadAnalysis(user);
-                // events = [];
 
-                // title: "34 - coffee",
-                //   allDay: true,
-                //   start: new Date("2022, 10, 02"),
-                //   end: new Date("2022, 10, 02"),
+                //new way to update the state event without duplicates
+                // Update events using setEvents, excluding duplicates
+                setAllEvents((prevEvents) => {
+                  const updatedEvents = [...prevEvents];
 
-                for (const val of user) {
-                  events.push({
-                    title: val.weight + " - " + val.producttype,
-                    allday: true,
-                    start: new Date(val.daterecorded),
-                    end: new Date(val.daterecorded),
-                  });
-                }
+                  for (const val of user) {
+                    const eventExists = updatedEvents.some(
+                      (event) => event.id === val.id
+                    );
+
+                    if (!eventExists) {
+                      updatedEvents.push({
+                        id: val.id,
+                        title: val.weight + " - " + val.producttype,
+                        allday: true,
+                        start: new Date(val.daterecorded),
+                        end: new Date(val.daterecorded),
+                      });
+                    }
+                  }
+
+                  return updatedEvents;
+                });
               } else {
                 //dont load
 
@@ -179,7 +190,7 @@ function RecordsCalender() {
       setIsLoading(true);
 
       setTimeout(() => {
-        fetch("http://localhost:8000/getRecords", {
+        fetch("https://api.terraweb.africa/getRecords", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
@@ -198,24 +209,35 @@ function RecordsCalender() {
           })
           .then((user) => {
             if (user[0].id >= 1) {
+              //load data
+
               setFoundErr(null);
 
               setIsLoading(null);
-              // setContacts(user);
-              // loadAnalysis(user);
 
-              events = [];
+              //new way of updating allevents without duplicates
+              // Update events using setEvents, excluding duplicates
+              setAllEvents((prevEvents) => {
+                const updatedEvents = [...prevEvents];
 
-              for (const val of user) {
-                events.push({
-                  title: val.weight + " - " + val.producttype,
-                  allday: true,
-                  start: new Date(val.daterecorded),
-                  end: new Date(val.daterecorded),
-                });
-              }
+                for (const val of user) {
+                  const eventExists = updatedEvents.some(
+                    (event) => event.id === val.id
+                  );
 
-              //load data
+                  if (!eventExists) {
+                    updatedEvents.push({
+                      id: val.id,
+                      title: val.weight + " - " + val.producttype,
+                      allday: true,
+                      start: new Date(val.daterecorded),
+                      end: new Date(val.daterecorded),
+                    });
+                  }
+                }
+
+                return updatedEvents;
+              });
             } else {
               //dont load
 
@@ -228,7 +250,7 @@ function RecordsCalender() {
             setIsLoading(null);
             // setFlag(1);
           });
-      }, 2000);
+      }, 5000);
     } else {
       setIsLoading(null);
     }
@@ -268,10 +290,10 @@ function RecordsCalender() {
       </button>
       <Calendar
         localizer={localizer}
-        events={events}
+        events={allEvents}
         startAccessor="start"
         endAccessor="end"
-        style={{ height: 500, margin: "10px" }}
+        style={{ height: 400, margin: "10px" }}
       />
     </div>
   );

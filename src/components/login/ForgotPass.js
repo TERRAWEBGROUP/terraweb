@@ -18,8 +18,8 @@ export default function ForgotPass({
   const navigate = useNavigate();
 
   return (
-    <div class="forgotpass">
-      <div class="forgotpass__box">
+    <div className="forgotpass">
+      <div className="forgotpass__box">
         <div className="forgotpass__header ">
           <img
             src="img/WHITE LOGO.png"
@@ -33,20 +33,23 @@ export default function ForgotPass({
             our database
           </label>
         </button>
-        <div class="forgotpass__main">
+        <div className="forgotpass__main">
           <input
             type="email"
             placeholder="email"
             id="emailforgot"
-            class="forgotpass__inputpass"
+            className="forgotpass__inputpass"
           />
 
-          <div class="forgotpass__btns">
-            <button class="btn btn-white">
-              <label class="link-white">Reset</label>
+          <div className="forgotpass__btns">
+            <button className="btn btn-white">
+              <label className="link-white">Reset</label>
             </button>
-            <button class="btn btn-orange sign_in">
-              <label onClick={() => navigate("/register")} class="link-orange">
+            <button className="btn btn-orange sign_in">
+              <label
+                onClick={() => navigate("/register")}
+                className="link-orange"
+              >
                 Sign In
               </label>
             </button>

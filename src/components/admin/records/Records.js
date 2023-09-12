@@ -22,6 +22,7 @@ const Records = () => {
 
   const [names, setNames] = useState({
     producttype: options[0].value,
+    company: "",
   });
 
   const [foundUsers, setFoundUsers] = useState();
@@ -30,6 +31,9 @@ const Records = () => {
   const [addFormData, setAddFormData] = useState({
     id: "",
     fullname: "",
+    farmerid: "",
+    firstName: "",
+    lastName: "",
     producttype: "",
     daterecorded: "",
     company: "",
@@ -46,6 +50,9 @@ const Records = () => {
   });
 
   const [editContactId, setEditContactId] = useState(null);
+
+  //display success info after successful registration
+  const [success, setSuccess] = useState("");
 
   const [foundErr, setFoundErr] = useState(null);
   const [foundErrAdd, setFoundErrAdd] = useState(null);
@@ -68,6 +75,35 @@ const Records = () => {
   const usernameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
+
+  //creating a fullname formatter here so that fullname data goes into the dataabase in the
+  //form of firstname Lastname
+  // Function to format the full name
+  const formatFullName = (firstName, lastName) => {
+    // Ensure the first letter of each name is capitalized
+    const formattedFirstName =
+      firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    const formattedLastName =
+      lastName.charAt(0).toUpperCase() + lastName.slice(1);
+
+    // Combine the formatted names into the full name
+    const fullName = `${formattedFirstName} ${formattedLastName}`;
+
+    return fullName;
+  };
+
+  //format the company to start with capital letter and remove white spaces
+  // Function to format the company name
+  const formatCompanyName = (input) => {
+    // Remove leading and trailing white spaces
+    const trimmedInput = input.trim();
+
+    // Ensure the first letter is capitalized
+    const formattedCompanyName =
+      trimmedInput.charAt(0).toUpperCase() + trimmedInput.slice(1);
+
+    return formattedCompanyName;
+  };
 
   //handle product type input
   const onProducttypeChange = (event) => {
@@ -92,8 +128,6 @@ const Records = () => {
     newFormData[fieldName] = fieldValue;
 
     setAddFormData(newFormData);
-
-    console.log(addFormData.producttype);
   };
 
   useEffect(() => {
@@ -106,7 +140,7 @@ const Records = () => {
           setIsLoading(true);
 
           setTimeout(() => {
-            fetch("http://localhost:8000/getDailyRecords", {
+            fetch("https://api.terraweb.africa/getDailyRecords", {
               method: "post",
               headers: { "Content-Type": "application/JSON" },
               body: JSON.stringify({
@@ -125,7 +159,6 @@ const Records = () => {
                 return response.json();
               })
               .then((user) => {
-                console.log(user);
                 if (user[0].id >= 1) {
                   setFoundErr(null);
 
@@ -153,7 +186,77 @@ const Records = () => {
       } catch (error) {}
     };
 
+    //load profile
+    const fetchProfile = () => {
+      let adminCookie = "";
+      adminCookie = Cookies.get("sessionidadmin");
+      let userid = "";
+      userid = Cookies.get("sessioniduser");
+      if (adminCookie.length >= 1 || userid.length >= 1) {
+        setIsLoading(true);
+        setTimeout(() => {
+          fetch("https://api.terraweb.africa/loadProfile", {
+            method: "post",
+            headers: { "Content-Type": "application/JSON" },
+            body: JSON.stringify({
+              adminid: adminCookie,
+              userid: userid,
+            }),
+          })
+            .then(function (response) {
+              if (response.status === 400) {
+                throw Error("Wrong credentials");
+              }
+              if (response === 500) {
+                throw Error("Could not complete request because of an error");
+              }
+
+              return response.json();
+            })
+            .then((user) => {
+              if (user[0].username.length >= 1) {
+                //load data
+
+                setFoundErrAdd(null);
+
+                setIsLoading(null);
+                setContacts(user);
+
+                setSuccess(null);
+                setDeleteState(null);
+
+                //store a name after load to display in the title of the users table
+                setNames((names) => ({
+                  ...names,
+                  company: user[0].company,
+                }));
+
+                setAddFormData((prevState) => ({
+                  ...prevState,
+                  company: user[0].company,
+                }));
+              } else {
+                //dont load
+
+                setFoundErrAdd(null);
+                setFoundErr(null);
+                setIsLoading(null);
+                setDeleteState(null);
+              }
+            })
+            .catch((err) => {
+              // setFoundErr(err.message);
+              setIsLoading(null);
+              // setFlag(1);
+            });
+        }, 150);
+      } else {
+        setIsLoading(null);
+      }
+    };
+
     fetchAll();
+    fetchProfile();
   }, []);
 
   //load analysis
@@ -168,7 +271,7 @@ const Records = () => {
       setIsLoading(true);
 
       setTimeout(() => {
-        fetch("http://localhost:8000/searchRecords", {
+        fetch("https://api.terraweb.africa/searchRecords", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
@@ -190,7 +293,6 @@ const Records = () => {
             return response.json();
           })
           .then((user) => {
-            console.log(user);
             if (user[0].id >= 1) {
               setFoundErr(null);
               setFoundErrAdd(null);
@@ -225,7 +327,6 @@ const Records = () => {
   const onSearchChange = (event) => {
     event.preventDefault();
     setSearchRecord(event.target.value);
-    console.log(searchRecord);
   };
 
   //fetch users
@@ -237,7 +338,7 @@ const Records = () => {
         setIsLoading(true);
 
         setTimeout(() => {
-          fetch("http://localhost:8000/getDailyRecords", {
+          fetch("https://api.terraweb.africa/getDailyRecords", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
@@ -256,7 +357,6 @@ const Records = () => {
               return response.json();
             })
             .then((user) => {
-              console.log(user);
               if (user[0].id >= 1) {
                 setFoundErr(null);
 
@@ -284,26 +384,140 @@ const Records = () => {
     } catch (error) {}
   };
 
+  //load profile
+  const fetchProfile = () => {
+    let adminCookie = "";
+    adminCookie = Cookies.get("sessionidadmin");
+    let userid = "";
+    userid = Cookies.get("sessioniduser");
+    if (adminCookie.length >= 1 || userid.length >= 1) {
+      setIsLoading(true);
+      setTimeout(() => {
+        fetch("https://api.terraweb.africa/loadProfile", {
+          method: "post",
+          headers: { "Content-Type": "application/JSON" },
+          body: JSON.stringify({
+            adminid: adminCookie,
+            userid: userid,
+          }),
+        })
+          .then(function (response) {
+            if (response.status === 400) {
+              throw Error("Wrong credentials");
+            }
+            if (response === 500) {
+              throw Error("Could not complete request because of an error");
+            }
+
+            return response.json();
+          })
+          .then((user) => {
+            if (user[0].username.length >= 1) {
+              //load data
+
+              setFoundErrAdd(null);
+
+              setIsLoading(null);
+              setContacts(user);
+
+              setSuccess(null);
+              setDeleteState(null);
+
+              //store a name after load to display in the title of the users table
+              setNames((names) => ({
+                ...names,
+                company: user[0].company,
+              }));
+            } else {
+              //dont load
+
+              setFoundErrAdd(null);
+              setFoundErr(null);
+              setIsLoading(null);
+              setDeleteState(null);
+            }
+          })
+          .catch((err) => {
+            // setFoundErr(err.message);
+            setIsLoading(null);
+            // setFlag(1);
+          });
+      }, 150);
+    } else {
+      setIsLoading(null);
+    }
+  };
+
   //check if user exists when full name is typed out
   const fetchUsers = () => {};
 
+  // const handleAddFormChange = (event) => {
+  //   event.preventDefault();
+
+  //   const fieldName = event.target.getAttribute("name");
+  //   const fieldValue = event.target.value;
+
+  //   const newFormData = { ...addFormData };
+  //   newFormData[fieldName] = fieldValue;
+
+  //   setAddFormData(newFormData);
+  // };
+
+  //temp handle add form change
   const handleAddFormChange = (event) => {
     event.preventDefault();
 
+    setSuccess(null);
+    setFoundErrAdd(null);
+
     const fieldName = event.target.getAttribute("name");
-    const fieldValue = event.target.value;
+    let fieldValue = event.target.value;
 
-    const newFormData = { ...addFormData };
-    newFormData[fieldName] = fieldValue;
+    // Check if the field name is "company" and apply formatting if needed
+    if (fieldName === "company") {
+      // Ensure the first letter is capitalized
+      fieldValue = fieldValue.charAt(0).toUpperCase() + fieldValue.slice(1);
 
-    setAddFormData(newFormData);
+      // Remove trailing white spaces
+      fieldValue = fieldValue.trim();
+      setAddFormData((prevState) => ({
+        ...prevState,
+        company: fieldValue,
+      }));
+    } else if (fieldName === "firstName") {
+      // Handle input changes for first name
+      if (/^[A-Za-z]+$/.test(fieldValue) || fieldValue === "") {
+        const fullName = formatFullName(fieldValue, addFormData.firstName);
+
+        setAddFormData((prevState) => ({
+          ...prevState,
+          firstName: fieldValue,
+          fullname: fullName,
+        }));
+      }
+    } else if (fieldName === "lastName") {
+      // Handle input changes for last name
+      if (/^[A-Za-z]+$/.test(fieldValue) || fieldValue === "") {
+        const fullName = formatFullName(addFormData.firstName, fieldValue);
+        setAddFormData((prevState) => ({
+          ...prevState,
+          lastName: fieldValue,
+          fullname: fullName,
+        }));
+      }
+    } else {
+      const newFormData = { ...addFormData };
+      newFormData[fieldName] = fieldValue;
+
+      setAddFormData(newFormData);
+    }
   };
 
   const handleEditFormChange = (event) => {
     event.preventDefault();
 
     const fieldName = event.target.getAttribute("name");
-    console.log("my field name ", fieldName);
+
     const fieldValue = event.target.value;
 
     const newFormData = { ...editFormData };
@@ -321,29 +535,39 @@ const Records = () => {
     event.preventDefault();
 
     const newContact = {
-      companyname: addFormData.companyname,
+      farmerid: addFormData.farmerid,
+      companyname: addFormData.company,
       producttype: addFormData.producttype,
       weight: addFormData.weight,
       fullname: addFormData.fullname,
     };
-    console.log(newContact);
 
     if (
-      newContact.companyname.length >= 1 &&
-      newContact.producttype.length >= 1 &&
-      newContact.fullname.length >= 1 &&
+      newContact.companyname.length >= 3 &&
+      newContact.producttype.length >= 3 &&
+      newContact.fullname.length >= 3 &&
       newContact.weight.length >= 1
+
+      // companyname &&
+      // companyname.length >= 1 &&
+      // producttype &&
+      // producttype.length >= 1 &&
+      // fullname &&
+      // fullname.length >= 1 &&
+      // weight &&
+      // weight.length >= 1
     ) {
       //send add agent request
       let adminCookie = Cookies.get("sessionidadmin");
-      if (adminCookie.length >= 1) {
+      if (adminCookie.length >= 4) {
         setIsLoadingAdd(true);
         setTimeout(() => {
-          fetch("http://localhost:8000/addnewrecord", {
+          fetch("https://api.terraweb.africa/addnewrecord", {
             method: "post",
             headers: { "Content-Type": "application/JSON" },
             body: JSON.stringify({
               adminid: adminCookie,
+              farmerid: newContact.farmerid,
               producttype: newContact.producttype,
               weight: newContact.weight,
               fullname: newContact.fullname,
@@ -361,7 +585,6 @@ const Records = () => {
               return response.json();
             })
             .then((user) => {
-              console.log(user);
               if (user) {
                 setFoundErr(null);
 
@@ -381,7 +604,6 @@ const Records = () => {
               }
             })
             .catch((err) => {
-              console.log(err);
               setFoundErrAdd(err.message);
               setIsLoadingAdd(null);
               // newContact.fullname = "";
@@ -416,7 +638,6 @@ const Records = () => {
 
     // setContacts(newContacts);
     // setEditContactId(null);
-    console.log(newContacts[index].id);
 
     //update
 
@@ -424,7 +645,7 @@ const Records = () => {
     if (adminCookie.length >= 1) {
       setIsLoadingSave(true);
       setTimeout(() => {
-        fetch("http://localhost:8000/updateRecord", {
+        fetch("https://api.terraweb.africa/updateRecord", {
           method: "post",
           headers: { "Content-Type": "application/JSON" },
           body: JSON.stringify({
@@ -449,7 +670,6 @@ const Records = () => {
             return response.json();
           })
           .then((user) => {
-            console.log(user);
             if (user[0].id >= 1) {
               setFoundErr(null);
 
@@ -498,8 +718,77 @@ const Records = () => {
     setEditContactId(null);
   };
 
+  //confirm delete record
+  const onDeleteYes = (id) => {
+    let adminCookie = Cookies.get("sessionidadmin");
+    if (adminCookie.length >= 1) {
+      fetch("https://api.terraweb.africa/deleterecord", {
+        method: "post",
+        headers: { "Content-Type": "application/JSON" },
+        body: JSON.stringify({
+          adminid: adminCookie,
+
+          id: id,
+        }),
+      })
+        .then(function (response) {
+          if (response.status === 400) {
+            throw Error("An error occurred, during delete.");
+          }
+          if (response === 500) {
+            throw Error("Could not complete request because of an error");
+          }
+
+          return response.json();
+        })
+        .then((user) => {
+          if (user) {
+            refreshRecords();
+          } else {
+            //dont load
+          }
+        })
+        .catch((err) => {
+          // setFlag(1);
+        });
+    } else {
+    }
+  };
+
+  const handleDeleteClick = (contactemail) => {
+    //delete alert
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className="bg-white br3 bb b--black-10   pa2 w-100 shadow-5 center ">
+            <h1>Confirm Delete Record</h1>
+            <p className="f3">Sure you want to delete this user record?</p>
+            <p className="b red f4">
+              Note that this cannot be <b className="red f3">UNDONE</b>
+            </p>
+            <label
+              className="dib w3 tc pa2 f3 ma2 white br-pill bg-red "
+              onClick={onClose}
+            >
+              No
+            </label>
+            <label
+              className="dib w4 f4 fr tc pa3 white br-pill bg-blue "
+              onClick={() => {
+                onDeleteYes(contactemail);
+                onClose();
+              }}
+            >
+              Yes, Delete it!
+            </label>
+          </div>
+        );
+      },
+    });
+  };
+
   return (
-    <div className="app-container center mt6 ">
+    <div className="app-container center mt6  ">
       {isLoading ? (
         <div className="db mb2">
           <Circles type="Oval" color="#000080" height={40} width={80} />
@@ -542,7 +831,7 @@ const Records = () => {
           </div>
           <div className="grid-item flex-ns pa3 mt2 ">
             <label className="f3  mt2">
-              Showing <b>1-50</b> of {contacts.count} Entries
+              Showing <b>1-50</b> of {contacts.length} Entries
             </label>
             <button
               className=" br-pill bw0 ml2 bg-white orange f4  b pa2 hover-bg-orange hover-white"
@@ -566,6 +855,7 @@ const Records = () => {
           <thead>
             <tr>
               <th>ID</th>
+              <th>Farmer ID</th>
               <th>Product Type</th>
               <th>Weight</th>
               <th>Company</th>
@@ -590,7 +880,7 @@ const Records = () => {
                   <ReadOnlyRow
                     contact={contact}
                     handleEditClick={handleEditClick}
-                    // handleDeleteClick={handleDeleteClick}
+                    handleDeleteClick={handleDeleteClick}
                   />
                 )}
               </Fragment>
@@ -609,26 +899,63 @@ const Records = () => {
         </button>
       </div>
 
-      <h2 className="f3 b white">Add New Record</h2>
+      <h2 className="f3 b white ">Add New Record</h2>
       <div className="">
+        <h2 className="b white f3 ma2">
+          Company<label> (Set to default)</label>
+        </h2>
+
         <input
-          className="br-pill"
+          // key={index}
+          className="br-pill b black"
           type="text"
           name="company"
+          defaultValue={names.company}
           required="required"
-          placeholder="Enter a company..."
+          disabled
+          // placeholder="Enter a company..."
+          // placeholder={names.company}
           onChange={handleAddFormChange}
         />
-        <div className="info dt">
-          <b className="b white f3 ma2">
-            Enter Farmer's names in the format (FirstName LastName)
-          </b>
+        <h2 className="b white f3 ma2">Farmer ID</h2>
+
+        <input
+          // key={index}
+          className="br-pill b black tl"
+          type="text"
+          name="farmerid"
+          defaultValue={names.farmerid}
+          // required="required"
+          placeholder="Enter Farmer ID"
+          // placeholder={names.company}
+          onChange={handleAddFormChange}
+        />
+        <div>
+          <h2 className="b white f3 ma2">
+            <b className="b white f3 ma2">First Name</b>
+          </h2>
+
           <input
-            className="br-pill w-50"
+            // ref={firstnameref}
+            className=" w-100 w-70-l tl  br-pill"
+            placeholder="First Name"
             type="text"
-            name="fullname"
-            required="required"
-            placeholder="Farmer's full names (FirstName LastName)"
+            name="firstName"
+            // value={addFormData.firstName}
+            onChange={handleAddFormChange}
+          />
+        </div>
+        <div>
+          <h2 className="b white f3 ma2">
+            <b className="b white f3 ma2">Last Name</b>
+          </h2>
+          <input
+            // ref={lastnameref}
+            className="w-100 w-70-l tl  br-pill"
+            placeholder="Last Name"
+            name="lastName"
+            type="text"
+            // value={addFormData.lastName}
             onChange={handleAddFormChange}
           />
         </div>
@@ -644,7 +971,6 @@ const Records = () => {
             </option>
           ))}
         </select>
-
         <input
           className="br-pill"
           type="number"
@@ -652,20 +978,17 @@ const Records = () => {
           placeholder="Enter weight (Kgs)"
           onChange={handleAddFormChange}
         />
-
         {isLoadingAdd ? (
           <div className="dib pa3">
             <Circles type="Oval" color="#000080" height={30} width={40} />
           </div>
         ) : null}
-
         <label
           className=" br-pill bg-white orange f4  b pa2 hover-bg-orange hover-white"
           onClick={handleAddFormSubmit}
         >
           Add
         </label>
-
         {successAdd ? (
           <div className="br-pill bg-white w-25">
             <label className="dt green f3 b  pa2">{successAdd}</label>
@@ -674,6 +997,13 @@ const Records = () => {
         {foundErrAdd ? (
           <label className="dt red f3 b  pb2">{foundErrAdd}</label>
         ) : null}
+        <div className="bg-white shadow-3  pa2 br4">
+          <label className="f3 b black ">Note:</label>
+          <label className="f3 b black">
+            You can only add or edit a record for a farmer that belongs to your
+            designated company.
+          </label>
+        </div>
       </div>
     </div>
   );
