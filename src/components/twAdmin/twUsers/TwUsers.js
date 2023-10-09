@@ -62,6 +62,16 @@ const TwUsers = () => {
     { value: "farmer", text: "farmer" },
     { value: "fieldAdmin", text: "fieldAdmin" },
   ];
+
+  //store select company values in an array
+  const companies = [
+    { value: "", text: "-- select company--" },
+    { value: "Terraweb", text: "Terraweb" },
+    { value: "Gatamura Dairy", text: "Gatamura Dairy" },
+    { value: "Mbuuni Coffee", text: "Mbuuni Coffee" },
+    { value: "Kanyua Tea", text: "Kanyua Tea" },
+  ];
+
   const [val, setVal] = useState("");
 
   const [names, setNames] = useState({
@@ -143,6 +153,11 @@ const TwUsers = () => {
     // Spreading "...state" ensures we don't "lose" fname,lname,email... etc
     setNames((names) => ({
       ...names,
+      company: formattedCompanyName,
+    }));
+
+    setAddFormData((prevState) => ({
+      ...prevState,
       company: formattedCompanyName,
     }));
   };
@@ -560,9 +575,6 @@ const TwUsers = () => {
     setSuccess(null);
     setFoundErrAdd(null);
 
-    console.log(addFormData.company);
-    console.log(addFormData);
-
     const newContact = {
       username: addFormData.username,
       farmerid: addFormData.farmerid,
@@ -576,7 +588,6 @@ const TwUsers = () => {
 
     if (
       newContact.username.length >= 1 &&
-      newContact.farmerid.length >= 1 &&
       newContact.email.length >= 1 &&
       newContact.password.length >= 8 &&
       newContact.company.length >= 1 &&
@@ -1015,7 +1026,7 @@ const TwUsers = () => {
         /> */}
         <div>
           <h2>
-            <label className="b f4 ">Farmer ID</label>
+            <label className="b f4 ">Farmer ID (optional)</label>
           </h2>
           <input
             // ref={firstnameref}
@@ -1107,12 +1118,12 @@ const TwUsers = () => {
           name="phone"
           onChange={handleAddFormChange}
         ></input>
-        <h2>
+        {/* <h2>
           <label className="b f4 ">Company</label>
         </h2>
         <input
           // className="w-100 w-50-ns tl  "
-          ref={companyRef}
+          // ref={companyRef}
           // type="text"
           // name="company"
           // required="required"
@@ -1124,11 +1135,26 @@ const TwUsers = () => {
           name="company"
           // defaultValue={names.company}
           required="required"
-          disabled
-          // placeholder="Enter a company..."
+          // disabled
+          placeholder="Enter a company..."
           // placeholder={names.company}
           onChange={handleAddFormChange}
-        />
+        /> */}
+        <h2>
+          <b className="b f3 white">Choose the company</b>
+        </h2>
+        <select
+          className="rounded f3 bg-white tracked br-pill w-100 w-50-ns"
+          value={names.company}
+          onChange={onCompanyChange}
+        >
+          {companies.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.text}
+            </option>
+          ))}
+        </select>
+
         <select
           ref={categoryRef}
           className=" f4 bg-white tracked pa2 w-20-l w-20-m"
@@ -1180,7 +1206,7 @@ const TwUsers = () => {
         <label className="f3 b black ">Note:</label>
         <label className="f3 b black">
           You can only add or edit a user or Admin that belongs to your
-          designated company.
+          designated company. Fill the form inputs carefully!
         </label>
       </div>
     </div>

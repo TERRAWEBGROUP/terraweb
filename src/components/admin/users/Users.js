@@ -560,9 +560,6 @@ const Users = () => {
     setSuccess(null);
     setFoundErrAdd(null);
 
-    console.log(addFormData.company);
-    console.log(addFormData);
-
     const newContact = {
       username: addFormData.username,
       farmerid: addFormData.farmerid,
@@ -576,7 +573,6 @@ const Users = () => {
 
     if (
       newContact.username.length >= 1 &&
-      newContact.farmerid.length >= 1 &&
       newContact.email.length >= 1 &&
       newContact.password.length >= 8 &&
       newContact.company.length >= 1 &&
@@ -1015,7 +1011,7 @@ const Users = () => {
         /> */}
         <div>
           <h2>
-            <label className="b f4 ">Farmer ID</label>
+            <label className="b f4 ">Farmer ID (optional)</label>
           </h2>
           <input
             // ref={firstnameref}

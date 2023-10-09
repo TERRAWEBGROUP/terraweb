@@ -138,7 +138,6 @@ function Register(props) {
 
   //handle username input
   const onUsernameChange = (event) => {
-    console.log(event.target.value);
     if (names.username.length >= 3) {
       setFlag(1);
     } else {

@@ -60,6 +60,9 @@ const TwRecords = () => {
 
   const [editContactId, setEditContactId] = useState(null);
 
+  //lookup farmer id and set state to show labe if found
+  const [foundFarmer, setFoundFarmer] = useState(null);
+
   //display success info after successful registration
   const [success, setSuccess] = useState("");
 
@@ -84,6 +87,10 @@ const TwRecords = () => {
   const usernameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
+
+  //use ref to fill inputs or clear them
+  const firtNameRef = useRef();
+  const lastNameRef = useRef();
 
   //creating a fullname formatter here so that fullname data goes into the dataabase in the
   //form of firstname Lastname
@@ -810,6 +817,102 @@ const TwRecords = () => {
     });
   };
 
+  //handle autofill first name and last name
+  const handleAutofillNames = () => {};
+
+  //handle look up farmer id
+  const handleLookupFarmerID = (event) => {
+    event.preventDefault();
+
+    const newContact = {
+      farmerid: addFormData.farmerid,
+    };
+
+    if (
+      newContact.farmerid.length >= 1
+
+      // companyname &&
+      // companyname.length >= 1 &&
+      // producttype &&
+      // producttype.length >= 1 &&
+      // fullname &&
+      // fullname.length >= 1 &&
+      // weight &&
+      // weight.length >= 1
+    ) {
+      //send add agent request
+      let adminCookie = Cookies.get("sessionidadmin");
+      if (adminCookie.length >= 4) {
+        setIsLoadingAdd(true);
+        setTimeout(() => {
+          fetch("https://api.terraweb.africa/lookupFarmerProfile", {
+            method: "post",
+            headers: { "Content-Type": "application/JSON" },
+            body: JSON.stringify({
+              adminid: adminCookie,
+              farmerid: newContact.farmerid,
+            }),
+          })
+            .then(function (response) {
+              if (response.status === 400) {
+                throw Error("An error occurred while adding records. ");
+              }
+              if (response === 500) {
+                throw Error("Could not complete request because of an error");
+              }
+
+              return response.json();
+            })
+            .then((data) => {
+              // //display the found
+              // // Assuming data contains the response from the server
+              // const { message } = data; // Extract the message
+              // const fullName = message.split(": ")[1]; // Extract the full name
+
+              // const [firstName, lastName] = fullName.split(" "); // Split full name into first and last names
+
+              // console.log(firstName); // First name
+              // console.log(lastName); // Last name
+
+              if (data) {
+                setFoundErr(null);
+
+                setIsLoadingAdd(null);
+                // setContacts(data);
+                setSuccessAdd(data);
+                //refresh data
+                //display found farmer
+                setFoundFarmer(data);
+                console.log(data);
+
+                refreshRecords();
+
+                //load data
+              } else {
+                //dont load
+
+                setFoundErrAdd(null);
+                setIsLoadingAdd(null);
+                // addFormData.fullname = "";
+                setFoundFarmer(null);
+              }
+            })
+
+            .catch((err) => {
+              // setFoundErrAdd();
+              setIsLoadingAdd(null);
+              // newContact.fullname = "";
+              setFoundFarmer(null);
+
+              // setFlag(1);
+            });
+        }, 1000);
+      } else {
+        setIsLoadingAdd(null);
+      }
+    }
+  };
+
   return (
     <div className="app-container center mt6  ">
       {isLoading ? (
@@ -968,6 +1071,14 @@ const TwRecords = () => {
           // placeholder={names.company}
           onChange={handleAddFormChange}
         />
+        <label
+          className=" br-pill bg-white orange f4  b pa2 hover-bg-orange hover-white"
+          onClick={handleLookupFarmerID}
+        >
+          Lookup ID
+        </label>
+        {foundFarmer ? <b className="green f3">{foundFarmer}</b> : null}
+
         <div>
           <h2 className="b white f3 ma2">
             <b className="b white f3 ma2">First Name</b>
